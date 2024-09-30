@@ -1,0 +1,17 @@
+{
+  "name": "naivecoin_3",
+  "version": "1.0.0",
+  "description": "Ex3 Mining rewards & Transactions",
+  "main": "index.js",
+  "scripts": {
+    "main": "node src/main.js",
+    "clean": "rm -rf data/naivechain_5521/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "elliptic": "^6.5.7",
+    "fs-extra": "^11.2.0",
+    "ramda": "^0.30.1"
+  }
+}
