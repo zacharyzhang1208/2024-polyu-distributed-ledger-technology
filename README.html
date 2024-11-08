@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Naivecoin - a cryptocurrency implementation in less than 1500 lines of code</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="naivecoin---a-cryptocurrency-implementation-in-less-than-1500-lines-of-code">Naivecoin - a cryptocurrency implementation in less than 1500 lines of code</h1>
+<p><a href="https://travis-ci.org/conradoqg/naivecoin"><img src="https://travis-ci.org/conradoqg/naivecoin.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/conradoqg/naivecoin?branch=master"><img src="https://coveralls.io/repos/github/conradoqg/naivecoin/badge.svg?branch=master" alt="Coverage Status"></a></p>
+<h3 id="motivation">Motivation</h3>
+<p>Cryptocurrencies and smart-contracts on top of a blockchain aren't the most trivial concepts to understand, things like wallets, addresses, block proof-of-work, transactions and their signatures, make more sense when they are in a broad context. Inspired by <a href="https://github.com/lhartikk/naivechain">naivechain</a>, this project is an attempt to provide as concise and simple an implementation of a cryptocurrency as possible.</p>
+<h3 id="what-is-cryptocurrency">What is cryptocurrency</h3>
+<p><a href="https://en.wikipedia.org/wiki/Cryptocurrency">From Wikipedia</a> : A cryptocurrency (or crypto currency) is a digital asset designed to work as a medium of exchange using cryptography to secure the transactions and to control the creation of additional units of the currency.</p>
+<h3 id="key-concepts-of-naivecoin">Key concepts of Naivecoin</h3>
+<ul>
+<li>Components
+<ul>
+<li>HTTP Server</li>
+<li>Node</li>
+<li>Blockchain</li>
+<li>Operator</li>
+<li>Miner</li>
+</ul>
+</li>
+<li>HTTP API interface to control everything</li>
+<li>Synchronization of blockchain and transactions</li>
+<li>Simple proof-of-work (The difficulty increases every 5 blocks)</li>
+<li>Addresses creation using a deterministic approach <a href="https://en.wikipedia.org/wiki/EdDSA">EdDSA</a></li>
+<li>Data is persisted to a folder</li>
+</ul>
+<blockquote>
+<p>Naivechain uses websocket for p2p communication, but it was dropped to simplify the understanding of message exchange. It is relying only on REST communication.</p>
+</blockquote>
+<h4 id="components-communication">Components communication</h4>
+<p><img src="file:///e:\0Blockchain_Technology\Project\COMP5521\naivecoin\doc\components.png" alt="Components communication"></p>
+<p>Not all components in this implementation follow the complete list of requirements for a secure and scalable cryptocurrency. Inside the source-code, you can find comments with <code>INFO:</code> that describes what parts could be improved (and how) and what techniques were used to solve that specific challenge.</p>
+<h4 id="http-server">HTTP Server</h4>
+<p>Provides an API to manage the blockchain, wallets, addresses, transaction creation, mining request and peer connectivity.</p>
+<p>It's the starting point to interact with the naivecoin, and every node provides a swagger API to make this interaction easier. Available endpoints:</p>
+<h5 id="blockchain">Blockchain</h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/blockchain/blocks</td>
+<td>Get all blocks</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/blocks/{index}</td>
+<td>Get block by index</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/blocks/{hash}</td>
+<td>Get block by hash</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/blocks/latest</td>
+<td>Get the latest block</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/blockchain/blocks/latest</td>
+<td>Update the latest block</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/blocks/transactions/{transactionId}</td>
+<td>Get a transaction from some block</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/transactions</td>
+<td>Get unconfirmed transactions</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/blockchain/transactions</td>
+<td>Create a transaction</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/blockchain/transactions/unspent</td>
+<td>Get unspent transactions</td>
+</tr>
+</tbody>
+</table>
+<h5 id="operator">Operator</h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/operator/wallets</td>
+<td>Get all wallets</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/operator/wallets</td>
+<td>Create a wallet from a password</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/operator/wallets/{walletId}</td>
+<td>Get wallet by id</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/operator/wallets/{walletId}/addresses</td>
+<td>Get all addresses of a wallet</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/operator/wallets/{walletId}/transactions</td>
+<td>Create a new transaction</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/operator/wallets/{walletId}/addresses</td>
+<td>Create a new address</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/operator/{addressId}/balance</td>
+<td>Get the balance of a given address</td>
+</tr>
+</tbody>
+</table>
+<h5 id="node">Node</h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/node/peers</td>
+<td>Get all peers connected to node</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/node/peers</td>
+<td>Connects a new peer to node</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/node/transactions/{transactionId}/confirmations</td>
+<td>Get how many confirmations a block has</td>
+</tr>
+</tbody>
+</table>
+<h5 id="miner">Miner</h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/miner/mine</td>
+<td>Mine a new block</td>
+</tr>
+</tbody>
+</table>
+<p>From the Swagger UI is possible to access a simple UI to visualize the blockchain and the unconfirmed transactions.</p>
+<p><img src="file:///e:\0Blockchain_Technology\Project\COMP5521\naivecoin\doc\ui.png" alt="UI"></p>
+<h4 id="blockchain-1">Blockchain</h4>
+<p>The blockchain holds two pieces of information, the block list (a linked list), and the transaction list (a hash map).</p>
+<p>It's responsible for:</p>
+<ul>
+<li>Verification of arriving blocks;</li>
+<li>Verification of arriving transactions;</li>
+<li>Synchronization of the transaction list;</li>
+<li>Synchronization of the block list;</li>
+</ul>
+<p>The blockchain is a linked list where the hash of the next block is calculated based on the hash of the previous block plus the data inside the block itself:</p>
+<p><img src="file:///e:\0Blockchain_Technology\Project\COMP5521\naivecoin\doc\blockchain.png" alt="Blockchain"></p>
+<p>A block is added to the block list if:</p>
+<ol>
+<li>The block is the last one (previous index + 1);</li>
+<li>The previous block is correct (previous hash == block.previousHash);</li>
+<li>The hash is correct (calculated block hash == block.hash);</li>
+<li>The difficulty level of the proof-of-work challenge is correct (difficulty at blockchain index <em>n</em> &lt; block difficulty);</li>
+<li>All transactions inside the block are valid;</li>
+<li>The sum of output transactions are equal the sum of input transactions + 50 coins representing the reward for the block miner;</li>
+<li>Check if there is a double spending in that block</li>
+<li>There is only 1 fee transaction and 1 reward transaction.</li>
+</ol>
+<p>A transaction inside a block is valid if:</p>
+<ol>
+<li>The transaction hash is correct (calculated transaction hash == transaction.hash);</li>
+<li>The signature of all input transactions are correct (transaction data signature can be verified with the public key of the address);</li>
+<li>The sum of input transactions are greater than output transactions, it needs to leave some room for the transaction fee;</li>
+<li>The transaction isn't already in the blockchain</li>
+<li>All input transactions are unspent in the blockchain.</li>
+</ol>
+<p>You can read this <a href="https://medium.com/@lhartikk/a-blockchain-in-200-lines-of-code-963cc1cc0e54#.dttbm9afr5">post</a> from <a href="https://github.com/lhartikk/naivechain">naivechain</a> for more details about how the blockchain works.</p>
+<p>Transactions is a list of unconfirmed transactions. Nothing special about it. In this implementation, the list of transactions contains only the unconfirmed transactions. As soon as a transaction is confirmed, the blockchain removes it from this list.</p>
+<pre><code>[
+    transaction 1,
+    transaction 2,
+    transaction 3
+]
+</code></pre>
+<p>A transaction is added to the transaction list if:</p>
+<ol>
+<li>It's not already in the transaction list;</li>
+<li>The transaction hash is correct (calculated transaction hash == transaction.hash);</li>
+<li>The signature of all input transactions are correct (transaction data signature can be verified with the public key of the address);</li>
+<li>The sum of input transactions are greater than output transactions, it needs to leave some room for the transaction fee;</li>
+<li>The transaction isn't already in the blockchain</li>
+<li>All input transactions are unspent in the blockchain;</li>
+</ol>
+<h5 id="block-structure">Block structure</h5>
+<p>A block represents a group of transactions and contains information that links it to the previous block.</p>
+<pre><code class="language-javascript">{ <span class="hljs-comment">// Block</span>
+    <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// (first block: 0)</span>
+    <span class="hljs-string">&quot;previousHash&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-comment">// (hash of previous block, first block is 0) (64 bytes)</span>
+    <span class="hljs-string">&quot;timestamp&quot;</span>: <span class="hljs-number">1465154705</span>, <span class="hljs-comment">// number of seconds since January 1, 1970</span>
+    <span class="hljs-string">&quot;nonce&quot;</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// nonce used to identify the proof-of-work step.</span>
+    <span class="hljs-string">&quot;transactions&quot;</span>: [ <span class="hljs-comment">// list of transactions inside the block</span>
+        { <span class="hljs-comment">// transaction 0</span>
+            <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;63ec3ac02f...8d5ebc6dba&quot;</span>, <span class="hljs-comment">// random id (64 bytes)</span>
+            <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;563b8aa350...3eecfbd26b&quot;</span>, <span class="hljs-comment">// hash taken from the contents of the transaction: sha256 (id + data) (64 bytes)</span>
+            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;regular&quot;</span>, <span class="hljs-comment">// transaction type (regular, fee, reward)</span>
+            <span class="hljs-string">&quot;data&quot;</span>: {
+                <span class="hljs-string">&quot;inputs&quot;</span>: [], <span class="hljs-comment">// list of input transactions</span>
+                <span class="hljs-string">&quot;outputs&quot;</span>: [] <span class="hljs-comment">// list of output transactions</span>
+            }
+        }
+    ],
+    <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;c4e0b8df46...199754d1ed&quot;</span> <span class="hljs-comment">// hash taken from the contents of the block: sha256 (index + previousHash + timestamp + nonce + transactions) (64 bytes)</span>
+}
+</code></pre>
+<p>The details about the nonce and the proof-of-work algorithm used to generate the block will be described somewhere ahead.</p>
+<h5 id="transaction-structure">Transaction structure</h5>
+<p>A transaction contains a list of inputs and outputs representing a transfer of coins between the coin owner and an address. The input list contains a list of existing unspent output transactions and it is signed by the address owner. The output list contains amounts to other addresses, including or not a change to the owner address.</p>
+<pre><code class="language-javascript">{ <span class="hljs-comment">// Transaction</span>
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;84286bba8d...7477efdae1&quot;</span>, <span class="hljs-comment">// random id (64 bytes)</span>
+    <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;f697d4ae63...c1e85f0ac3&quot;</span>, <span class="hljs-comment">// hash taken from the contents of the transaction: sha256 (id + data) (64 bytes)</span>
+    <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;regular&quot;</span>, <span class="hljs-comment">// transaction type (regular, fee, reward)</span>
+    <span class="hljs-string">&quot;data&quot;</span>: {
+        <span class="hljs-string">&quot;inputs&quot;</span>: [ <span class="hljs-comment">// Transaction inputs</span>
+            {
+                <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;9e765ad30c...e908b32f0c&quot;</span>, <span class="hljs-comment">// transaction hash taken from a previous unspent transaction output (64 bytes)</span>
+                <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>, <span class="hljs-comment">// index of the transaction taken from a previous unspent transaction output</span>
+                <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">5000000000</span>, <span class="hljs-comment">// amount of satoshis</span>
+                <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;dda3ce5aa5...b409bf3fdc&quot;</span>, <span class="hljs-comment">// from address (64 bytes)</span>
+                <span class="hljs-string">&quot;signature&quot;</span>: <span class="hljs-string">&quot;27d911cac0...6486adbf05&quot;</span> <span class="hljs-comment">// transaction input hash: sha256 (transaction + index + amount + address) signed with owner address&#x27;s secret key (128 bytes)</span>
+            }
+        ],
+        <span class="hljs-string">&quot;outputs&quot;</span>: [ <span class="hljs-comment">// Transaction outputs</span>
+            {
+                <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">10000</span>, <span class="hljs-comment">// amount of satoshis</span>
+                <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;4f8293356d...b53e8c5b25&quot;</span> <span class="hljs-comment">// to address (64 bytes)</span>
+            },
+            {
+                <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">4999989999</span>, <span class="hljs-comment">// amount of satoshis</span>
+                <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;dda3ce5aa5...b409bf3fdc&quot;</span> <span class="hljs-comment">// change address (64 bytes)</span>
+            }
+        ]
+    }
+}
+</code></pre>
+<h4 id="operator-1">Operator</h4>
+<p>The operator handles wallets and addresses as well the transaction creation. Most of its operation are CRUD related. Each operator has its list of wallets and addresses, meaning that they aren't synchronized between nodes.</p>
+<h5 id="wallet-structure">Wallet structure</h5>
+<p>A wallet contains a random id number, the password hash and the secret generated from that password. It contains a list of key pairs each one representing an address.</p>
+<pre><code class="language-javascript">[
+    { <span class="hljs-comment">// Wallet</span>
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;884d3e0407...f29af094fd&quot;</span>, <span class="hljs-comment">// random id (64 bytes)</span>
+        <span class="hljs-string">&quot;passwordHash&quot;</span>: <span class="hljs-string">&quot;5ba9151d1c...1424be8e2c&quot;</span>, <span class="hljs-comment">// hash taken from password: sha256 (password) (64 bytes)</span>
+        <span class="hljs-string">&quot;secret&quot;</span>: <span class="hljs-string">&quot;6acb83e364...c1a04b6ee6&quot;</span>, <span class="hljs-comment">// pbkdf2 secret taken from password hash: sha512 (salt + passwordHash + random factor)</span>
+        <span class="hljs-string">&quot;keyPairs&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-number">1</span>,
+                <span class="hljs-string">&quot;secretKey&quot;</span>: <span class="hljs-string">&quot;6acb83e364...ee6bcdbc73&quot;</span>, <span class="hljs-comment">// EdDSA secret key generated from the secret (1024 bytes)</span>
+                <span class="hljs-string">&quot;publicKey&quot;</span>: <span class="hljs-string">&quot;dda3ce5aa5...b409bf3fdc&quot;</span> <span class="hljs-comment">// EdDSA public key generated from the secret (64 bytes) (also known as address)</span>
+            },
+            {
+                <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-number">2</span>,
+                <span class="hljs-string">&quot;secretKey&quot;</span>: <span class="hljs-string">&quot;072ab010ed...246ed16d26&quot;</span>, <span class="hljs-comment">// EdDSA secret key generated from pbkdf2 (sha512 (salt + passwordHash + random factor)) over last address secret key (1024 bytes)</span>
+                <span class="hljs-string">&quot;publicKey&quot;</span>: <span class="hljs-string">&quot;4f8293356d...b53e8c5b25&quot;</span>  <span class="hljs-comment">// EdDSA public key generated from the secret (64 bytes) (also known as address)</span>
+            }     
+        ]
+    }
+]
+</code></pre>
+<h5 id="address-structure">Address structure</h5>
+<p>The address is created in a deterministic way, meaning that for a given password, the next address is created based on the previous address (or the password secret if it's the first address).</p>
+<p>It uses the EdDSA algorithm to generate a secret public key pair using a seed that can come from a random generated value from the password hash (also in a deterministic way) or from the last secret key.</p>
+<pre><code class="language-javascript">{ <span class="hljs-comment">// Address</span>
+    <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;secretKey&quot;</span>: <span class="hljs-string">&quot;6acb83e364...ee6bcdbc73&quot;</span>, <span class="hljs-comment">// EdDSA secret key generated from the secret (1024 bytes)</span>
+    <span class="hljs-string">&quot;publicKey&quot;</span>: <span class="hljs-string">&quot;dda3ce5aa5...b409bf3fdc&quot;</span> <span class="hljs-comment">// EdDSA public key generated from the secret (64 bytes) (also known as address)</span>
+},
+</code></pre>
+<p>Only the public key is exposed as the user's address.</p>
+<h4 id="miner-1">Miner</h4>
+<p>The Miner gets the list of pending transactions and creates a new block containing the transactions. By configuration, every block has at most 2 transactions in it.</p>
+<p>Assembling a new block:</p>
+<ol>
+<li>From the list of unconfirmed transaction selected candidate transactions that are not already in the blockchain or is not already selected;</li>
+<li>Get the first two transactions from the candidate list of transactions;</li>
+<li>Add a new transaction containing the fee value to the miner's address, 1 satoshi per transaction;</li>
+<li>Add a reward transaction containing 50 coins to the miner's address;</li>
+<li>Prove work for this block;</li>
+</ol>
+<h5 id="proof-of-work">Proof-of-work</h5>
+<p>The proof-of-work is done by calculating the 14 first hex values for a given transaction hash and increases the nonce until it reaches the minimal difficulty level required. The difficulty increases by an exponential value (power of 5) every 5 blocks created. Around the 70th block created it starts to spend around 50 seconds to generate a new block with this configuration. All these values can be tweaked.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> difficulty = <span class="hljs-variable language_">this</span>.<span class="hljs-property">blockchain</span>.<span class="hljs-title function_">getDifficulty</span>();
+<span class="hljs-keyword">do</span> {
+    block.<span class="hljs-property">timestamp</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">getTime</span>() / <span class="hljs-number">1000</span>;
+    block.<span class="hljs-property">nonce</span>++;
+    block.<span class="hljs-property">hash</span> = block.<span class="hljs-title function_">toHash</span>();
+    blockDifficulty = block.<span class="hljs-title function_">getDifficulty</span>();
+} <span class="hljs-keyword">while</span> (blockDifficulty &gt;= difficulty);
+</code></pre>
+<p>The <code>this.blockchain.getDifficulty()</code> returns the hex value of the current blockchain's index difficulty. This value is calculated by powering the initial difficulty by 5 every 5 blocks.</p>
+<p>The <code>block.getDifficulty()</code> returns the hex value of the first 14 bytes of block's hash and compares it to the currently accepted difficulty.</p>
+<p>When the hash generated reaches the desired difficulty level, it returns the block as it is.</p>
+<h4 id="node-1">Node</h4>
+<p>The node contains a list of connected peers and does all the data exchange between nodes, including:</p>
+<ol>
+<li>Receive new peers and check what to do with it</li>
+<li>Receive new blocks and check what to do with it</li>
+<li>Receive new transactions and check what to do with it</li>
+</ol>
+<p>The node rebroadcasts all information it receives unless it doesn't do anything with it, for example, if it already has the peer/transaction/blockchain.</p>
+<p>An extra responsibility is to get a number of confirmations for a given transaction. It does that by asking every node if it has that transaction in its blockchain.</p>
+<h3 id="quick-start">Quick start</h3>
+<pre><code class="language-sh"><span class="hljs-comment"># Run a node</span>
+$ node bin/naivecoin.js
+
+<span class="hljs-comment"># Run two nodes</span>
+$ node bin/naivecoin.js -p 3001 --name 1
+$ node bin/naivecoin.js -p 3002 --name 2 --peers http://localhost:3001
+
+<span class="hljs-comment"># Access the swagger API</span>
+http://localhost:3001/api-docs/
+</code></pre>
+<h4 id="example-wallet-address-transaction-and-mining">Example (wallet, address, transaction and mining)</h4>
+<pre><code class="language-sh"><span class="hljs-comment"># Create a wallet using password &#x27;t t t t t&#x27; (5 words)</span>
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> -d <span class="hljs-string">&#x27;{ &quot;password&quot;: &quot;t t t t t&quot; }&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/wallets&#x27;</span>
+{<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-string">&quot;a2fb4d3f93ea3d4624243c03f507295c0c7cb5b78291a651e5575dcd03dfeeeb&quot;</span>,<span class="hljs-string">&quot;addresses&quot;</span>:[]}
+
+<span class="hljs-comment"># Create two addresses for the wallet created (replace walletId)</span>
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> --header <span class="hljs-string">&#x27;password: t t t t t&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/wallets/a2fb4d3f93ea3d4624243c03f507295c0c7cb5b78291a651e5575dcd03dfeeeb/addresses&#x27;</span>
+{<span class="hljs-string">&quot;address&quot;</span>:<span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>}
+
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> --header <span class="hljs-string">&#x27;password: t t t t t&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/wallets/a2fb4d3f93ea3d4624243c03f507295c0c7cb5b78291a651e5575dcd03dfeeeb/addresses&#x27;</span>
+{<span class="hljs-string">&quot;address&quot;</span>:<span class="hljs-string">&quot;c3c96504e432e35caa94c30034e70994663988ab80f94e4b526829c99958afa8&quot;</span>}
+
+<span class="hljs-comment"># Mine a block to the address 1 so we can have some coins</span>
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> -d <span class="hljs-string">&#x27;{ &quot;rewardAddress&quot;: &quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot; }&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/miner/mine&#x27;</span>
+{
+    <span class="hljs-string">&quot;index&quot;</span>: 1,
+    <span class="hljs-string">&quot;nonce&quot;</span>: 1,
+    <span class="hljs-string">&quot;previousHash&quot;</span>: <span class="hljs-string">&quot;c4e0b8df46ce5cb2bcb0379ab0840228536cf4cd489783532a7c9d199754d1ed&quot;</span>,
+    <span class="hljs-string">&quot;timestamp&quot;</span>: 1493475731.692,
+    <span class="hljs-string">&quot;transactions&quot;</span>: [
+        {
+            <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;ab872b412afe62a087f3a8c354a27377f5fda33d7c98a1db3b1b0985801a6784&quot;</span>,
+            <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;423bae0bd2f4782f34c770df5be21f856b468a45bf88bb146da8ec2fe0fd3d21&quot;</span>,
+            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;reward&quot;</span>,
+            <span class="hljs-string">&quot;data&quot;</span>: {
+                <span class="hljs-string">&quot;inputs&quot;</span>: [],
+                <span class="hljs-string">&quot;outputs&quot;</span>: [
+                    {
+                        <span class="hljs-string">&quot;amount&quot;</span>: 5000000000,
+                        <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+                    }
+                ]
+            }
+        }
+    ],
+    <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;0311a3a89198ccf888c76337cc190e2db238b67a7db0d5062aac97d14fb679b4&quot;</span>
+}
+
+<span class="hljs-comment"># Create a transaction that transfer 1000000000 satoshis from address 1 to address 2</span>
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> --header <span class="hljs-string">&#x27;password: t t t t t&#x27;</span> -d <span class="hljs-string">&#x27;{ &quot;fromAddress&quot;: &quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;, &quot;toAddress&quot;: &quot;c3c96504e432e35caa94c30034e70994663988ab80f94e4b526829c99958afa8&quot;, &quot;amount&quot;: 1000000000, &quot;changeAddress&quot;: &quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot; }&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/wallets/a2fb4d3f93ea3d4624243c03f507295c0c7cb5b78291a651e5575dcd03dfeeeb/transactions&#x27;</span>
+ {
+  <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;c3c1e6fbff949042b065dc9e22d065a54ab826595fd8877d2be8ddb8cbb0e27f&quot;</span>,
+  <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;3b5bbf698031e437787fe7b31f098e214a1eeff01fee9b95c22bccf20146982c&quot;</span>,
+  <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;regular&quot;</span>,
+  <span class="hljs-string">&quot;data&quot;</span>: {
+    <span class="hljs-string">&quot;inputs&quot;</span>: [
+      {
+        <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;ab872b412afe62a087f3a8c354a27377f5fda33d7c98a1db3b1b0985801a6784&quot;</span>,
+        <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,
+        <span class="hljs-string">&quot;amount&quot;</span>: 5000000000,
+        <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>,
+        <span class="hljs-string">&quot;signature&quot;</span>: <span class="hljs-string">&quot;4500f432d6b400811d83364224ce62bccd042ad92299118c0672bc5bc1390ffdfdbef135f36927d8bd77843f3a0b868d9ed3a5346dcbeda6c06f33876cfae00d&quot;</span>
+      }
+    ],
+    <span class="hljs-string">&quot;outputs&quot;</span>: [
+      {
+        <span class="hljs-string">&quot;amount&quot;</span>: 1000000000,
+        <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;c3c96504e432e35caa94c30034e70994663988ab80f94e4b526829c99958afa8&quot;</span>
+      },
+      {
+        <span class="hljs-string">&quot;amount&quot;</span>: 3999999999,
+        <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+      }
+    ]
+  }
+}
+
+<span class="hljs-comment"># Mine a new block containing that transaction</span>
+$ curl -X POST --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> -d <span class="hljs-string">&#x27;{ &quot;rewardAddress&quot;: &quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot; }&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/miner/mine&#x27;</span>
+{
+  <span class="hljs-string">&quot;index&quot;</span>: 2,
+  <span class="hljs-string">&quot;nonce&quot;</span>: 6,
+  <span class="hljs-string">&quot;previousHash&quot;</span>: <span class="hljs-string">&quot;0311a3a89198ccf888c76337cc190e2db238b67a7db0d5062aac97d14fb679b4&quot;</span>,
+  <span class="hljs-string">&quot;timestamp&quot;</span>: 1493475953.226,
+  <span class="hljs-string">&quot;transactions&quot;</span>: [
+    {
+      <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;c3c1e6fbff949042b065dc9e22d065a54ab826595fd8877d2be8ddb8cbb0e27f&quot;</span>,
+      <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;3b5bbf698031e437787fe7b31f098e214a1eeff01fee9b95c22bccf20146982c&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;regular&quot;</span>,
+      <span class="hljs-string">&quot;data&quot;</span>: {
+        <span class="hljs-string">&quot;inputs&quot;</span>: [
+          {
+            <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;ab872b412afe62a087f3a8c354a27377f5fda33d7c98a1db3b1b0985801a6784&quot;</span>,
+            <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,
+            <span class="hljs-string">&quot;amount&quot;</span>: 5000000000,
+            <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>,
+            <span class="hljs-string">&quot;signature&quot;</span>: <span class="hljs-string">&quot;4500f432d6b400811d83364224ce62bccd042ad92299118c0672bc5bc1390ffdfdbef135f36927d8bd77843f3a0b868d9ed3a5346dcbeda6c06f33876cfae00d&quot;</span>
+          }
+        ],
+        <span class="hljs-string">&quot;outputs&quot;</span>: [
+          {
+            <span class="hljs-string">&quot;amount&quot;</span>: 1000000000,
+            <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;c3c96504e432e35caa94c30034e70994663988ab80f94e4b526829c99958afa8&quot;</span>
+          },
+          {
+            <span class="hljs-string">&quot;amount&quot;</span>: 3999999999,
+            <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+          }
+        ]
+      }
+    },
+    {
+      <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;6b55b1e85369743f360edd5bedc3467eba81b35c2b88490686eee90946231dd6&quot;</span>,
+      <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;86f5b4a40c027e1ef7e060dd9b9ab7ae48258f3a43dfc19d9d8111c396463b8c&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;fee&quot;</span>,
+      <span class="hljs-string">&quot;data&quot;</span>: {
+        <span class="hljs-string">&quot;inputs&quot;</span>: [],
+        <span class="hljs-string">&quot;outputs&quot;</span>: [
+          {
+            <span class="hljs-string">&quot;amount&quot;</span>: 1,
+            <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+          }
+        ]
+      }
+    },
+    {
+      <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;0f6f6c04602ac1bea15157a1a86978d46488a7865fa3db3bfc581a1407950599&quot;</span>,
+      <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;f9fa281fbf9ffd3d63dd0c3503588fe3010dd6740a4a960b98d1be4aa1fa7a05&quot;</span>,
+      <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;reward&quot;</span>,
+      <span class="hljs-string">&quot;data&quot;</span>: {
+        <span class="hljs-string">&quot;inputs&quot;</span>: [],
+        <span class="hljs-string">&quot;outputs&quot;</span>: [
+          {
+            <span class="hljs-string">&quot;amount&quot;</span>: 5000000000,
+            <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+          }
+        ]
+      }
+    }
+  ],
+  <span class="hljs-string">&quot;hash&quot;</span>: <span class="hljs-string">&quot;08861fc4864ba0bf7a899db9ffaaa39376ad3857b1115951db074e3d06f93a5f&quot;</span>
+}
+
+<span class="hljs-comment"># Check how many confirmations that transaction has.</span>
+$ curl -X GET --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/node/transactions/c3c1e6fbff949042b065dc9e22d065a54ab826595fd8877d2be8ddb8cbb0e27f/confirmations&#x27;</span>
+{<span class="hljs-string">&quot;confirmations&quot;</span>:1}
+
+<span class="hljs-comment"># Get address 1 balance</span>
+$ curl -X GET --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c/balance&#x27;</span>
+{<span class="hljs-string">&quot;balance&quot;</span>:9000000000}
+
+<span class="hljs-comment"># Get address 2 balance</span>
+$ curl -X GET --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/operator/c574de33acfd82f2146d2f45f37ce95b7bdca133b8ad310adbd46938c75992c8/balance&#x27;</span>
+{<span class="hljs-string">&quot;balance&quot;</span>:1000000000}
+
+<span class="hljs-comment"># Get unspent transactions for address 1</span>
+$ curl -X GET --header <span class="hljs-string">&#x27;Content-Type: application/json&#x27;</span> <span class="hljs-string">&#x27;http://localhost:3001/blockchain/transactions/unspent?address=e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&#x27;</span>
+[
+  {
+    <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;c3c1e6fbff949042b065dc9e22d065a54ab826595fd8877d2be8ddb8cbb0e27f&quot;</span>,
+    <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;1&quot;</span>,
+    <span class="hljs-string">&quot;amount&quot;</span>: 3999999999,
+    <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+  },
+  {
+    <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;6b55b1e85369743f360edd5bedc3467eba81b35c2b88490686eee90946231dd6&quot;</span>,
+    <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,
+    <span class="hljs-string">&quot;amount&quot;</span>: 1,
+    <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+  },
+  {
+    <span class="hljs-string">&quot;transaction&quot;</span>: <span class="hljs-string">&quot;0f6f6c04602ac1bea15157a1a86978d46488a7865fa3db3bfc581a1407950599&quot;</span>,
+    <span class="hljs-string">&quot;index&quot;</span>: <span class="hljs-string">&quot;0&quot;</span>,
+    <span class="hljs-string">&quot;amount&quot;</span>: 5000000000,
+    <span class="hljs-string">&quot;address&quot;</span>: <span class="hljs-string">&quot;e155df3a1bac05f88321b73931b48b54ea4300be9d1225e0b62638f537e5544c&quot;</span>
+  }
+]
+</code></pre>
+<h4 id="docker">Docker</h4>
+<pre><code class="language-sh"><span class="hljs-comment"># Build the image</span>
+$ docker build . -t naivecoin
+
+<span class="hljs-comment"># Run naivecoin in a docker</span>
+$ ./dockerExec.sh
+
+<span class="hljs-comment"># Run naivecoin in a docker using port 3002</span>
+$ ./dockerExec.sh -p 3002
+
+<span class="hljs-comment"># Run naivecoin in a docker options</span>
+$ ./dockerExec.sh -h
+Usage: ./dockerExec.sh -a HOST -p PORT -l LOG_LEVEL -e PEERS -n NAME
+
+<span class="hljs-comment"># Run docker-compose with 3 nodes</span>
+$ docker-compose up
+</code></pre>
+<h3 id="client">Client</h3>
+<pre><code class="language-sh"><span class="hljs-comment"># Command-line options</span>
+$ node bin/naivecoin.js -h
+Usage: bin\naivecoin.js [options]
+
+Options:
+  -a, --host       Host address. (localhost by default)
+  -p, --port       HTTP port. (3001 by default)
+  -l, --log-level  Log level (7=<span class="hljs-built_in">dir</span>, debug, time and trace, 6=<span class="hljs-built_in">log</span> and info,
+                   4=warn, 3=error, assert, 6 by default).
+  --peers          Peers list.                                           [array]
+  --name           Node name/identifier.
+  -h, --<span class="hljs-built_in">help</span>       Show <span class="hljs-built_in">help</span>                                           [boolean]
+</code></pre>
+<h3 id="development">Development</h3>
+<pre><code class="language-sh"><span class="hljs-comment"># Cloning repository</span>
+$ git <span class="hljs-built_in">clone</span> git@github.com:conradoqg/naivecoin.git
+$ <span class="hljs-built_in">cd</span> naivecoin
+$ npm install
+
+<span class="hljs-comment"># Testing</span>
+$ npm <span class="hljs-built_in">test</span>
+</code></pre>
+<h3 id="contribution-and-license-agreement">Contribution and License Agreement</h3>
+<p>If this implementation does something wrong, please feel free to contribute by opening an issue or sending a PR. The main goal of this project is not to create a full-featured cryptocurrency, but a good example of how it works.</p>
+<p>If you contribute code to this project, you are implicitly allowing your code
+to be distributed under the Apache 2.0 license. You are also implicitly verifying that
+all code is your original work.</p>
+<p><a href="https://twitter.com/intent/tweet?text=Check%20it%20out%3A%20Naivecoin%20-%20a%20cryptocurrency%20implementation%20in%20less%20than%201500%20lines%20of%20code&amp;url=%5Bobject%20Object%5D"><img src="https://img.shields.io/twitter/url/https/github.com/conradoqg/naivecoin.svg?style=social" alt="Twitter"></a></p>
+<p><a href="https://raw.githubusercontent.com/conradoqg/naivecoin/master/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg" alt="GitHub license"></a></p>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
