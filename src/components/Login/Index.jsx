@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { USER_TYPES } from '../../constants/userTypes';
+import { USER_TYPES, DEFAULT_ROUTES } from '../../constants/userTypes';
 import '../../css/Login.css';
 
 const Login = ({ onLogin }) => {
@@ -26,8 +26,13 @@ const Login = ({ onLogin }) => {
     if (isLogin) {
       // 处理登录逻辑
       console.log('login info:', formData);
+      
+      // 调用父组件的登录回调
       onLogin(formData.userType);
-      navigate('/dashboard');
+      
+      // 根据用户类型跳转到对应的首页路由
+      const defaultRoute = DEFAULT_ROUTES[formData.userType];
+      navigate(defaultRoute);
     } else {
       // 处理注册逻辑
       console.log('register info:', formData);

@@ -6,8 +6,7 @@ import { USER_TYPES } from '../../constants/userTypes';
 import '../../css/App.css';
 
 // 临时页面组件
-const Dashboard = () => <h1>Dashboard Page</h1>;
-const Profile = () => <h1>Profile Page</h1>;
+const Checkin = () => <h1>Check In Page</h1>;
 const Courses = () => <h1>Courses Page</h1>;
 const Schedule = () => <h1>Schedule Page</h1>;
 const Settings = () => <h1>Settings Page</h1>;
@@ -44,8 +43,7 @@ const App = () => {
                                 />
                                 <div className={`main-content ${sidebarCollapsed ? 'content-expanded' : ''}`}>
                                     <Routes>
-                                        <Route path="/dashboard" element={<Dashboard />} />
-                                        <Route path="/profile" element={<Profile />} />
+                                        <Route path="/checkin" element={<Checkin />} />
                                         <Route path="/courses" element={<Courses />} />
                                         <Route path="/schedule" element={<Schedule />} />
                                         <Route path="/settings" element={<Settings />} />

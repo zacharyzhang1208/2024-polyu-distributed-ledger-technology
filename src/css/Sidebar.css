@@ -54,19 +54,37 @@
   display: flex;
   align-items: center;
   padding: 0.8rem 1rem;
-  color: white;
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: all 0.3s ease;
+  border-radius: 4px;
+  margin: 0.2rem 0.5rem;
+}
+
+.sidebar-nav li.active a {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .sidebar-nav li a:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .sidebar-nav i {
   margin-right: 1rem;
   width: 20px;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.sidebar-nav i.active {
+  color: white;
+}
+
+.sidebar-nav span.active {
+  color: white;
+  font-weight: 500;
 }
 
 .sidebar-footer {
@@ -81,8 +99,8 @@
   width: 100%;
   padding: 0.8rem;
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -91,12 +109,18 @@
   transition: all 0.3s ease;
 }
 
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .logout-btn i {
   margin-right: 0.5rem;
 }
 
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.sidebar.collapsed .logout-btn i {
+  margin-right: 0;
 }
 
 /* 响应式设计 */
@@ -113,3 +137,10 @@
     display: none;
   }
 } 
+
+/* 折叠状态下的高亮样式 */
+.sidebar.collapsed .sidebar-nav li.active a {
+  background: rgba(255, 255, 255, 0.1);
+  width: 40px;
+  margin: 0.2rem auto;
+}

@@ -1,27 +1,29 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { USER_TYPES } from '../../constants/userTypes';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { USER_TYPES, USER_ROUTES } from '../../constants/userTypes';
 import '../../css/Sidebar.css';
 
-const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse }) => {
+const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse, onLogout }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     
-    // 根据用户类型获取侧边栏菜单项
     const getMenuItems = () => {
-        const menuItems = {
-            [USER_TYPES.STUDENT]: [
-                { path: '/checkin', icon: 'fas fa-home', label: 'Check In' },
-            ],
-            [USER_TYPES.TEACHER]: [
-                { path: '/attandance', icon: 'fas fa-home', label: 'Attandance' },
-                { path: '/courses', icon: 'fas fa-chalkboard-teacher', label: 'Teaching Courses' },
-            ]
-        };
-
-        return menuItems[userType];
+        return USER_ROUTES[userType] || USER_ROUTES[USER_TYPES.STUDENT];
     };
 
     const menuItems = getMenuItems();
+
+    const isActive = (path) => {
+        return location.pathname === path;
+    };
+
+    // 处理登出
+    const handleLogout = () => {
+        // 调用父组件传入的登出函数
+        onLogout();
+        // 导航到登录页
+        navigate('/login');
+    };
 
     return (
         <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
@@ -38,10 +40,10 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse }) => {
             <nav className="sidebar-nav">
                 <ul>
                     {menuItems.map((item, index) => (
-                        <li key={index}>
+                        <li key={index} className={isActive(item.path) ? 'active' : ''}>
                             <a onClick={() => navigate(item.path)}>
-                                <i className={item.icon}></i>
-                                {!collapsed && <span>{item.label}</span>}
+                                <i className={`${item.icon} ${isActive(item.path) ? 'active' : ''}`}></i>
+                                {!collapsed && <span className={isActive(item.path) ? 'active' : ''}>{item.label}</span>}
                             </a>
                         </li>
                     ))}
@@ -49,7 +51,11 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse }) => {
             </nav>
 
             <div className="sidebar-footer">
-                <button className="logout-btn">
+                <button 
+                    className="logout-btn"
+                    onClick={handleLogout}  // 绑定登出处理函数
+                    title={collapsed ? 'Logout' : ''}  // 折叠时显示提示
+                >
                     <i className="fas fa-sign-out-alt"></i>
                     {!collapsed && <span>Logout</span>}
                 </button>
