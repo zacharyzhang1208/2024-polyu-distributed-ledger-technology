@@ -30,7 +30,8 @@ describe('Integration Test', () => {
     let context = {};
 
     step('start server 1', () => {
-        return createNaivecoin(name1, 'localhost', 3001, [])
+        // 
+        return createNaivecoin(name1, 'localhost', 3003, [])
             .then((httpServer) => {
                 context.httpServer1 = httpServer;
             });
@@ -161,7 +162,8 @@ describe('Integration Test', () => {
     });
 
     step('start server 2', () => {
-        return createNaivecoin(name2, 'localhost', 3002, [{ url: 'http://localhost:3001' }])
+        //
+        return createNaivecoin(name2, 'localhost', 3004, [{ url: 'http://localhost:3003' }])
             .then((httpServer) => {
                 context.httpServer2 = httpServer;
             });
@@ -326,7 +328,8 @@ describe('Integration Test', () => {
                     return context.httpServer1.stop();
                 })
                 .then(() => {
-                    return createNaivecoin(name1, 'localhost', 3001, [], false)
+                    //
+                    return createNaivecoin(name1, 'localhost', 3, [], false)
                         .then((httpServer) => {
                             context.httpServer1 = httpServer;
                         });
