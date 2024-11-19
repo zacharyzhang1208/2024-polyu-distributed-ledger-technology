@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { USER_TYPES } from '../../constants/userTypes';
 import '../../css/Login.css';
 
-const Login = () => {
+const Login = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    email: ''
+    email: '',
+    userType: USER_TYPES.STUDENT
   });
 
   const handleInputChange = (e) => {
@@ -22,6 +26,8 @@ const Login = () => {
     if (isLogin) {
       // 处理登录逻辑
       console.log('login info:', formData);
+      onLogin(formData.userType);
+      navigate('/dashboard');
     } else {
       // 处理注册逻辑
       console.log('register info:', formData);
@@ -33,6 +39,18 @@ const Login = () => {
       <div className="login-box">
         <h2>{isLogin ? 'Login' : 'Register'}</h2>
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleInputChange}
+              className="user-type-select"
+            >
+              <option value={USER_TYPES.STUDENT}>Student</option>
+              <option value={USER_TYPES.TEACHER}>Teacher</option>
+            </select>
+          </div>
+
           <div className="form-group">
             <input
               type="text"

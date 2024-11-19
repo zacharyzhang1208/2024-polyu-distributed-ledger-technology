@@ -1,15 +1,31 @@
 import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Sidebar from './components/Sidebar/Index.jsx';
-import Login from './components/Login/Index.jsx';
+import Sidebar from '../Sidebar/Sidebar';
+import Login from '../Login/Index';
+import { USER_TYPES } from '../../constants/userTypes';
+import '../../css/App.css';
 
-function App() {
+// 临时页面组件
+const Dashboard = () => <h1>Dashboard Page</h1>;
+const Profile = () => <h1>Profile Page</h1>;
+const Courses = () => <h1>Courses Page</h1>;
+const Schedule = () => <h1>Schedule Page</h1>;
+const Settings = () => <h1>Settings Page</h1>;
+
+const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userType, setUserType] = useState(USER_TYPES.STUDENT);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // 登录处理函数
-    const handleLogin = () => {
+    const handleLogin = (type) => {
         setIsAuthenticated(true);
+        setUserType(type);
+    };
+
+    // 处理侧边栏折叠
+    const handleSidebarCollapse = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
     };
 
     return (
@@ -20,9 +36,13 @@ function App() {
                     path="/*"
                     element={
                         isAuthenticated ? (
-                            <div style={{ display: 'flex' }}>
-                                <Sidebar />
-                                <div className="main-content">
+                            <div className="app-container">
+                                <Sidebar 
+                                    userType={userType}
+                                    collapsed={sidebarCollapsed}
+                                    onCollapse={handleSidebarCollapse}
+                                />
+                                <div className={`main-content ${sidebarCollapsed ? 'content-expanded' : ''}`}>
                                     <Routes>
                                         <Route path="/dashboard" element={<Dashboard />} />
                                         <Route path="/profile" element={<Profile />} />
@@ -41,19 +61,6 @@ function App() {
             </Routes>
         </Router>
     );
-}
+};
 
-// 临时的页面组件
-const Dashboard = () => <h1>Dashboard Page</h1>;
-const Profile = () => <h1>Profile Page</h1>;
-const Courses = () => <h1>Courses Page</h1>;
-const Schedule = () => <h1>Schedule Page</h1>;
-const Settings = () => <h1>Settings Page</h1>;
-
-function main() {
-    const root = createRoot(document.getElementById("app"));
-    root.render(<App />);
-}
-
-main();
-
+export default App; 

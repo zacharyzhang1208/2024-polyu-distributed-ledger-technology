@@ -116,4 +116,27 @@ input::placeholder {
     padding: 0.7rem;
   }
 }
+
+/* 在现有样式中添加 */
+.user-type-select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.user-type-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.user-type-select option {
+  padding: 0.8rem;
+}
  
