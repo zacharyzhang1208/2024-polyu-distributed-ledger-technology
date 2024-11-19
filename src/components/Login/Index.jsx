@@ -21,23 +21,23 @@ const Login = () => {
     e.preventDefault();
     if (isLogin) {
       // 处理登录逻辑
-      console.log('登录信息:', formData);
+      console.log('login info:', formData);
     } else {
       // 处理注册逻辑
-      console.log('注册信息:', formData);
+      console.log('register info:', formData);
     }
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>{isLogin ? '登录' : '注册'}</h2>
+        <h2>{isLogin ? 'Login' : 'Register'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <input
               type="text"
               name="username"
-              placeholder="用户名"
+              placeholder="student id"
               value={formData.username}
               onChange={handleInputChange}
             />
@@ -48,7 +48,7 @@ const Login = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="电子邮箱"
+                placeholder="e-mail"
                 value={formData.email}
                 onChange={handleInputChange}
               />
@@ -59,21 +59,21 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              placeholder="密码"
+              placeholder="password"
               value={formData.password}
               onChange={handleInputChange}
             />
           </div>
 
           <button type="submit" className="submit-btn">
-            {isLogin ? '登录' : '注册'}
+            {isLogin ? 'Login' : 'Register'}
           </button>
         </form>
 
         <p className="switch-form">
-          {isLogin ? '还没有账号？' : '已有账号？'}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
           <span onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? '立即注册' : '立即登录'}
+            {isLogin ? 'Register' : 'Login'}
           </span>
         </p>
       </div>
