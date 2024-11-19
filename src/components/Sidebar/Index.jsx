@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { USER_TYPES, USER_ROUTES } from '../../constants/userTypes';
 import '../../css/Sidebar.css';
 
-const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse, onLogout }) => {
+const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogout }) => {
     const navigate = useNavigate();
     const location = useLocation();
     
@@ -26,15 +26,9 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse, onLogou
     };
 
     return (
-        <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+        <div className="sidebar">
             <div className="sidebar-header">
-                <h3>{collapsed ? 'LMS' : 'Learning Management'}</h3>
-                <button 
-                    className="collapse-btn"
-                    onClick={onCollapse}
-                >
-                    {collapsed ? '>' : '<'}
-                </button>
+                <h3>Attandance System</h3>
             </div>
 
             <nav className="sidebar-nav">
@@ -43,7 +37,7 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse, onLogou
                         <li key={index} className={isActive(item.path) ? 'active' : ''}>
                             <a onClick={() => navigate(item.path)}>
                                 <i className={`${item.icon} ${isActive(item.path) ? 'active' : ''}`}></i>
-                                {!collapsed && <span className={isActive(item.path) ? 'active' : ''}>{item.label}</span>}
+                               <span className={isActive(item.path) ? 'active' : ''}>{item.label}</span>
                             </a>
                         </li>
                     ))}
@@ -54,10 +48,10 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, collapsed, onCollapse, onLogou
                 <button 
                     className="logout-btn"
                     onClick={handleLogout}  // 绑定登出处理函数
-                    title={collapsed ? 'Logout' : ''}  // 折叠时显示提示
+                    title='Logout'  // 折叠时显示提示
                 >
                     <i className="fas fa-sign-out-alt"></i>
-                    {!collapsed && <span>Logout</span>}
+                    <span>Logout</span>
                 </button>
             </div>
         </div>

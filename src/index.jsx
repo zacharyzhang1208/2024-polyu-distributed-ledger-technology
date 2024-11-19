@@ -38,7 +38,10 @@ function App() {
                                     onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                                     onLogout={handleLogout}
                                 />
-                                <div style={{ marginLeft: '250px', padding: '20px', width: 'calc(100% - 250px)' }}>
+                                <div style={{ 
+                                    marginLeft: sidebarCollapsed ? '70px' : '250px', 
+                                    width: sidebarCollapsed ? 'calc(100% - 70px)' : 'calc(100% - 250px)'
+                                }}>
                                     <Routes>
                                         <Route path="/courses" element={<Courses />} />
                                         <Route path="/checkin" element={<Checkin />} />
