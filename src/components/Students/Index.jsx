@@ -9,10 +9,10 @@ const students = [
     // 添加更多学生数据...
 ];
 
-const Student = () => {
+const Students = () => {
     return (
         <div className="student-container">
-            <h2>学生信息</h2>
+            <h2>Students Info</h2>
             <table className="student-table">
                 <thead>
                     <tr>
@@ -37,4 +37,4 @@ const Student = () => {
     );
 };
 
-export default Student; 
+export default Students; 
