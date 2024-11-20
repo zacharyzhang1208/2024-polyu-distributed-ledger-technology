@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Sidebar from '../Sidebar/Sidebar.jsx';
-import Login from '../Login/Index.jsx';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { USER_TYPES } from '../../constants/userTypes';
-import '../../css/App.css';
+import Login from '../Login/Index.jsx';
+import Sidebar from '../Sidebar/Index.jsx';
 
-// 临时页面组件
-const Checkin = () => <h1>Check In Page</h1>;
+import Students from '../Students/Index.jsx';
+
 const Courses = () => <h1>Courses Page</h1>;
-const Students = () => <h1>Students Page</h1>;
+const Checkin = () => <h1>Check In Page</h1>;
 const Attandance = () => <h1>Attandance Page</h1>;
 
-const App = () => {
+function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState(USER_TYPES.STUDENT);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // 登录处理函数
     const handleLogin = (type) => {
@@ -21,6 +21,12 @@ const App = () => {
         setUserType(type);
     };
 
+    // 登出处理函数
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        setUserType(USER_TYPES.STUDENT);
+        // 可以在这里清除其他状态或本地存储
+    };
 
     return (
         <Router>
@@ -30,15 +36,22 @@ const App = () => {
                     path="/*"
                     element={
                         isAuthenticated ? (
-                            <div className="app-container">
-                                <Sidebar userType={userType} />
-                                <div className={`main-content ${sidebarCollapsed ? 'content-expanded' : ''}`}>
+                            <div style={{ display: 'flex' }}>
+                                <Sidebar 
+                                    userType={userType}
+                                    collapsed={sidebarCollapsed}
+                                    onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                                    onLogout={handleLogout}
+                                />
+                                <div style={{ 
+                                    marginLeft: sidebarCollapsed ? '70px' : '250px', 
+                                    width: sidebarCollapsed ? 'calc(100% - 70px)' : 'calc(100% - 250px)'
+                                }}>
                                     <Routes>
-                                        <Route path="/checkin" element={<Checkin />} />
                                         <Route path="/courses" element={<Courses />} />
-                                        <Route path="/attandance" element={<Attandance />} />
+                                        <Route path="/checkin" element={<Checkin />} />
                                         <Route path="/students" element={<Students />} />
-                                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                        <Route path="/attandance" element={<Attandance />} />
                                     </Routes>
                                 </div>
                             </div>
@@ -50,6 +63,6 @@ const App = () => {
             </Routes>
         </Router>
     );
-};
+}
 
-export default App; 
+export default App;
