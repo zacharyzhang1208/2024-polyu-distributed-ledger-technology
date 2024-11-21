@@ -3,10 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { USER_TYPES } from '../../constants/userTypes';
 import Login from '../Login/Index.jsx';
 import Sidebar from '../Sidebar/Index.jsx';
-
+import Courses from '../Courses/Index.jsx';
 import Students from '../Students/Index.jsx';
 
-const Courses = () => <h1>Courses Page</h1>;
 const Checkin = () => <h1>Check In Page</h1>;
 const Attandance = () => <h1>Attandance Page</h1>;
 

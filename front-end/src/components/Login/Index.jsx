@@ -21,7 +21,7 @@ const Login = ({ onLogin }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isLogin) {
       // 处理登录逻辑
@@ -36,6 +36,31 @@ const Login = ({ onLogin }) => {
     } else {
       // 处理注册逻辑
       console.log('register info:', formData);
+      
+      try {
+        const response = await fetch('http://localhost:3001/data', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Response from backend:', data);
+        
+        // 注册成功后可以添加其他逻辑
+        // 例如显示成功消息或自动切换到登录页面
+        alert('Registration successful!');
+        setIsLogin(true);
+      } catch (error) {
+        console.error('Error during registration:', error);
+        alert('Registration failed: ' + error.message);
+      }
     }
   };
 
