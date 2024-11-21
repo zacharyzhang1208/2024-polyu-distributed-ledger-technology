@@ -38,7 +38,7 @@ const Login = ({ onLogin }) => {
       console.log('register info:', formData);
       
       try {
-        const response = await fetch('http://localhost:3001/data', {
+        const response = await fetch('http://localhost:3001/operator/wallets', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
