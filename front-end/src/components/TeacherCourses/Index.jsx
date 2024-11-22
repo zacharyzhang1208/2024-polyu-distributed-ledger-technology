@@ -5,6 +5,8 @@ import SearchBar from '../SearchBar/Index';
 import '../../css/TeacherCourses.css';
 import '../../css/SearchBar.css';
 import '../../css/CourseCard.css';
+import '../../css/Modal.css';
+import '../../css/Courses.css';
 
 // 示例课程数据，添加更多详细信息
 const coursesData = [

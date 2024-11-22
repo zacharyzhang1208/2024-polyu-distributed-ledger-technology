@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import CourseCard from '../CourseCard/Index';
 import SearchBar from '../SearchBar/Index';  // 导入搜索组件
-import '../../css/TeacherCourses.css';
+import '../../css/StudentCourses.css';
+import '../../css/Courses.css';
+import '../../css/CourseCard.css';
+
 
 // 示例课程数据，添加更多详细信息
 const coursesData = [
@@ -22,8 +25,20 @@ const coursesData = [
 ];
 
 const StudentCourses = () => {
+
+    const [courses, setCourses] = useState(coursesData);
+
     return (
-        <h2>My Courses</h2>
+        <div className="courses-container">
+            <div className="courses-header">
+                <SearchBar />
+            </div>
+            <div className="courses-grid">
+                {courses.map(course => (
+                    <CourseCard key={course.id} course={course} />
+                ))}
+            </div>
+        </div>
     );
 };
 

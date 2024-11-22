@@ -9,7 +9,8 @@
     margin-bottom: 20px;
 }
 
-.courses-controls {
-    display: flex;
-    gap: 10px;
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
 }

@@ -14,12 +14,6 @@ const CourseCard = ({ course, onClick }) => {
             <div className="course-footer">
                 <div className="course-seats">
                     <span>{course.enrolled}/{course.capacity}</span>
-                    <div className="course-progress">
-                        <div 
-                            className="progress-bar" 
-                            style={{width: `${(course.enrolled/course.capacity)*100}%`}}
-                        ></div>
-                    </div>
                 </div>
             </div>
         </div>

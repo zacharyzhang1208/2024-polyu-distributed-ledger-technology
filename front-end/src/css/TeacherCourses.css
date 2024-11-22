@@ -1,123 +1,3 @@
-.courses-container {
-    padding: 20px;
-}
-
-.courses-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    animation: modalSlideIn 0.3s ease-out;
-}
-
-.modal-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-}
-
-.modal-close:hover {
-    color: #333;
-}
-
-.modal-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-}
-
-.info-section {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 6px;
-}
-
-.info-section h3 {
-    margin-top: 0;
-    color: #667eea;
-    margin-bottom: 15px;
-}
-
-.info-section p {
-    margin: 8px 0;
-    color: #666;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.modal-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    flex: 1;
-    color: white;
-    transition: opacity 0.2s ease;
-}
-
-.modal-btn.enroll {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-.modal-btn.attendance {
-    background: linear-gradient(135deg, #764ba2 0%, #20b16e 100%);
-}
-
-.modal-btn:hover {
-    opacity: 0.9;
-}
-
-@keyframes modalSlideIn {
-    from {
-        transform: translateY(-30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
 .qr-modal-content {
     background: white;
     padding: 30px;
@@ -326,4 +206,15 @@
 
 .modal-btn.attendance {
     background: linear-gradient(135deg, #20b16e 0%, #667eea 100%);
+}
+
+@keyframes modalSlideIn {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 } 
