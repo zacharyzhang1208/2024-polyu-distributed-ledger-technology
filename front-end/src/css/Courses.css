@@ -161,19 +161,32 @@
     color: #666;
 }
 
-.modal-enroll-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+.modal-actions {
+    display: flex;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.modal-enroll-btn:hover {
+.modal-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+    color: white;
+    transition: opacity 0.2s ease;
+}
+
+.modal-btn.enroll {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.modal-btn.attendance {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.modal-btn:hover {
     opacity: 0.9;
 }
 
@@ -186,4 +199,41 @@
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+.qr-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+    text-align: center;
+}
+
+.qr-code-container {
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+}
+
+.attendance-info {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.attendance-info p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.attendance-info strong {
+    color: #333;
 } 

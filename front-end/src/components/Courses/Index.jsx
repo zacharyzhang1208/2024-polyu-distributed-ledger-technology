@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import '../../css/Courses.css';
 
 // 示例课程数据，添加更多详细信息
@@ -25,6 +26,8 @@ const Courses = () => {
     const [courses, setCourses] = useState(coursesData);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showQRCode, setShowQRCode] = useState(false);
+    const [attendanceCode, setAttendanceCode] = useState('');
 
     // 处理搜索
     const handleSearch = (e) => {
@@ -66,6 +69,20 @@ const Courses = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedCourse(null);
+    };
+
+    // 修改处理创建签到的函数
+    const handleCreateAttendance = () => {
+        // TODO: 调用后端 API 获取签到码
+        const mockAttendanceCode = `ATTEND-${selectedCourse.id}-${Date.now()}`;
+        setAttendanceCode(mockAttendanceCode);
+        setShowQRCode(true);
+    };
+
+    // 关闭二维码页面
+    const handleCloseQRCode = () => {
+        setShowQRCode(false);
+        setAttendanceCode('');
     };
 
     return (
@@ -117,9 +134,31 @@ const Courses = () => {
                     </div>
                 ))}
             </div>
+            
+            {/* 添加二维码模态框 */}
+            {showQRCode && (
+                <div className="modal-overlay" onClick={handleCloseQRCode}>
+                    <div className="qr-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={handleCloseQRCode}>×</button>
+                        <h2>Course Attendance QR Code</h2>
+                        <div className="qr-code-container">
+                            <QRCodeSVG 
+                                value={attendanceCode}
+                                size={256}
+                                level="H"
+                            />
+                        </div>
+                        <div className="attendance-info">
+                            <p><strong>Course:</strong> {selectedCourse.name}</p>
+                            <p><strong>Attendance Code:</strong> {attendanceCode}</p>
+                            <p><strong>Valid Until:</strong> {new Date(Date.now() + 30*60000).toLocaleTimeString()}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-            {/* 课程详情 Modal */}
-            {isModalOpen && selectedCourse && (
+            {/* 原有的课程详情模态框 */}
+            {isModalOpen && selectedCourse && !showQRCode && (
                 <div className="modal-overlay" onClick={handleCloseModal}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={handleCloseModal}>×</button>
@@ -148,7 +187,17 @@ const Courses = () => {
                                 <p>{selectedCourse.prerequisites}</p>
                             </div>
                         </div>
-                        <button className="modal-enroll-btn">Enroll in Course</button>
+                        <div className="modal-actions">
+                            <button className="modal-btn enroll">
+                                Enroll in Course
+                            </button>
+                            <button 
+                                className="modal-btn attendance"
+                                onClick={handleCreateAttendance}
+                            >
+                                Create Attendance
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
