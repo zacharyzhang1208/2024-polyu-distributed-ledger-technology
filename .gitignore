@@ -1,12 +1,1 @@
-<<<<<<< HEAD
-Backend/node_modules
-.nyc_output
-coverage
-.idea
-*.log
-yarn.lock
-.vscode
-data
-=======
 .vscode/
->>>>>>> 848e6919fa1624a17713b2214f7e8250cd84ff47
