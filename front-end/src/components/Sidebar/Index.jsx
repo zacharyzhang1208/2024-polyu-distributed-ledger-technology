@@ -28,7 +28,7 @@ const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogout }) => {
     return (
         <div className="sidebar">
             <div className="sidebar-header">
-                <h3>Attandance System</h3>
+                <h3>Attendance System</h3>
             </div>
 
             <nav className="sidebar-nav">
