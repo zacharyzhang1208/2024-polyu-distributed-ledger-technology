@@ -6,7 +6,7 @@ import Sidebar from '../Sidebar/Index.jsx';
 import Courses from '../Courses/Index.jsx';
 import Students from '../Students/Index.jsx';
 
-const Checkin = () => <h1>Check In Page</h1>;
+const Checkin = () => <h1>My Courses</h1>;
 const Attandance = () => <h1>Attandance Page</h1>;
 
 function App() {
@@ -47,10 +47,8 @@ function App() {
                                     width: sidebarCollapsed ? 'calc(100% - 70px)' : 'calc(100% - 250px)'
                                 }}>
                                     <Routes>
-                                        <Route path="/courses" element={<Courses />} />
-                                        <Route path="/checkin" element={<Checkin />} />
-                                        <Route path="/students" element={<Students />} />
-                                        <Route path="/attandance" element={<Attandance />} />
+                                        <Route path="/student_courses" element={<Courses />} />
+                                        <Route path="/teacher_courses" element={<Courses />} />
                                     </Routes>
                                 </div>
                             </div>
