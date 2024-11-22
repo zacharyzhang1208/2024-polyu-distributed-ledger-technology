@@ -3,7 +3,9 @@ module.exports = {
     // INFO: The mining reward could decreases over time like bitcoin. See https://en.bitcoin.it/wiki/Mining#Reward.
     MINING_REWARD: 5000000000,
     // INFO: Usually it's a fee over transaction size (not quantity)
-    FEE_PER_TRANSACTION: 1,
+    FEE_PER_TRANSACTION: 0,
+    FAUCET_ADDRESS: "e368822ca3c0f4c2b9e89bf4c206fe17f2028e7faec8f40d8c552896237a624e",
+    FAUCET_WALLET_ID: "bae2d59ebaf1e5d40443662ae3730b65418477ee5f80471a0b3a4d513409ec34",
     // INFO: Usually the limit is determined by block size (not quantity)
     TRANSACTIONS_PER_BLOCK: 2,
     genesisBlock: {
