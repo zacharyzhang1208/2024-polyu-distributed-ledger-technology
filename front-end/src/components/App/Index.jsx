@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { USER_TYPES } from '../../constants/userTypes';
 import Login from '../Login/Index.jsx';
 import Sidebar from '../Sidebar/Index.jsx';
-import Courses from '../Courses/Index.jsx';
+import TeacherCourses from '../TeacherCourses/Index';
+import StudentCourses from '../StudentCourses/Index';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,8 +44,8 @@ function App() {
                                     width: sidebarCollapsed ? 'calc(100% - 70px)' : 'calc(100% - 250px)'
                                 }}>
                                     <Routes>
-                                        <Route path="/student_courses" element={<Courses />} />
-                                        <Route path="/teacher_courses" element={<Courses />} />
+                                        <Route path="/student_courses" element={<StudentCourses />} />
+                                        <Route path="/teacher_courses" element={<TeacherCourses />} />
                                     </Routes>
                                 </div>
                             </div>

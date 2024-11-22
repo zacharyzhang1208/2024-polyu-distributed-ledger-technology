@@ -1,0 +1,28 @@
+.courses-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+}
+
+.sort-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+@media (max-width: 768px) {
+    .courses-controls {
+        flex-direction: column;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+} 

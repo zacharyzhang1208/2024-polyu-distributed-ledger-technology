@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import '../../css/Courses.css';
+import CourseCard from '../CourseCard/Index';
+import SearchBar from '../SearchBar/Index';
+import '../../css/TeacherCourses.css';
+import '../../css/SearchBar.css';
+import '../../css/CourseCard.css';
 
 // 示例课程数据，添加更多详细信息
 const coursesData = [
@@ -20,7 +24,7 @@ const coursesData = [
     // ... 其他课程数据
 ];
 
-const Courses = () => {
+const TeacherCourses = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('name');
     const [courses, setCourses] = useState(coursesData);
@@ -112,60 +116,25 @@ const Courses = () => {
     return (
         <div className="courses-container">
             <div className="courses-header">
-                <h2>Courses</h2>
-                <div className="courses-controls">
-                    <input
-                        type="text"
-                        placeholder="Search courses..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="search-input"
-                    />
-                    <select 
-                        value={sortBy}
-                        onChange={handleSort}
-                        className="sort-select"
-                    >
-                        <option value="name">Sort by Name</option>
-                        <option value="credits">Sort by Credits</option>
-                        <option value="semester">Sort by Semester</option>
-                    </select>
-                </div>
+                <SearchBar 
+                    searchTerm={searchTerm}
+                    onSearch={handleSearch}
+                    sortBy={sortBy}
+                    onSort={handleSort}
+                />
             </div>
 
             <div className="courses-grid">
                 {courses.map(course => (
-                    <div 
-                        key={course.id} 
-                        className="course-card"
-                        onClick={() => handleCardClick(course)}
-                    >
-                        <div className="course-type-icon">
-                            <i className="fas fa-graduation-cap"></i>
-                        </div>
-                        <h3>{course.name}</h3>
-                        <div className="course-info">
-                            <p><i className="fas fa-user"></i> {course.instructor}</p>
-                            <p><i className="fas fa-book"></i> {course.credits} Credits</p>
-                            <p><i className="fas fa-calendar"></i> {course.semester}</p>
-                            <p><i className="fas fa-clock"></i> {course.schedule}</p>
-                        </div>
-                        <div className="course-footer">
-                            <div className="course-seats">
-                                <span>{course.enrolled}/{course.capacity}</span>
-                                <div className="course-progress">
-                                    <div 
-                                        className="progress-bar" 
-                                        style={{width: `${(course.enrolled/course.capacity)*100}%`}}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <CourseCard 
+                        key={course.id}
+                        course={course}
+                        onClick={handleCardClick}
+                    />
                 ))}
             </div>
             
-            {/* 添加二维码模态框 */}
+            {/* QRCode Modal */}
             {showQRCode && (
                 <div className="modal-overlay" onClick={handleCloseQRCode}>
                     <div className="qr-modal-content" onClick={e => e.stopPropagation()}>
@@ -342,4 +311,4 @@ const Courses = () => {
     );
 };
 
-export default Courses; 
+export default TeacherCourses; 

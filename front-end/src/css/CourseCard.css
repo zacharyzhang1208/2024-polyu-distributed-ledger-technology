@@ -1,0 +1,88 @@
+.course-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
+}
+
+.course-card h3 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.course-info {
+    margin-bottom: 15px;
+    display: grid;
+    gap: 12px;
+}
+
+.course-info p {
+    margin: 0;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.course-info i {
+    margin-right: 10px;
+    color: #667eea;
+    width: 20px;
+    text-align: center;
+}
+
+.course-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.course-seats {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-progress {
+    flex: 1;
+    margin: 0 10px;
+    height: 4px;
+    background: #edf2f7;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+} 
