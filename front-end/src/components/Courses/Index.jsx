@@ -29,6 +29,7 @@ const Courses = () => {
     const [showQRCode, setShowQRCode] = useState(false);
     const [attendanceCode, setAttendanceCode] = useState('');
     const [showAttendanceList, setShowAttendanceList] = useState(false);
+    const [showEnrolledStudents, setShowEnrolledStudents] = useState(false);
 
     // 处理搜索
     const handleSearch = (e) => {
@@ -97,6 +98,17 @@ const Courses = () => {
         setShowAttendanceList(false);
     };
 
+    // 添加处理查看已注册学生的函数
+    const handleViewEnrolledStudents = () => {
+        // TODO: 从后端获取已注册学生数据
+        setShowEnrolledStudents(true);
+    };
+
+    // 关闭已注册学生列表页面
+    const handleCloseEnrolledStudents = () => {
+        setShowEnrolledStudents(false);
+    };
+
     return (
         <div className="courses-container">
             <div className="courses-header">
@@ -128,21 +140,27 @@ const Courses = () => {
                         className="course-card"
                         onClick={() => handleCardClick(course)}
                     >
+                        <div className="course-type-icon">
+                            <i className="fas fa-graduation-cap"></i>
+                        </div>
                         <h3>{course.name}</h3>
                         <div className="course-info">
                             <p><i className="fas fa-user"></i> {course.instructor}</p>
-                            <p><i className="fas fa-graduation-cap"></i> {course.credits} Credits</p>
+                            <p><i className="fas fa-book"></i> {course.credits} Credits</p>
                             <p><i className="fas fa-calendar"></i> {course.semester}</p>
+                            <p><i className="fas fa-clock"></i> {course.schedule}</p>
                         </div>
-                        <button 
-                            className="enroll-btn"
-                            onClick={(e) => {
-                                e.stopPropagation(); // 防止触发卡片的点击事件
-                                // 处理选课逻辑
-                            }}
-                        >
-                            Enroll Now
-                        </button>
+                        <div className="course-footer">
+                            <div className="course-seats">
+                                <span>{course.enrolled}/{course.capacity}</span>
+                                <div className="course-progress">
+                                    <div 
+                                        className="progress-bar" 
+                                        style={{width: `${(course.enrolled/course.capacity)*100}%`}}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -201,21 +219,65 @@ const Courses = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {/* 添加更多测试数据 */}
+                                    {Array.from({ length: 20 }, (_, i) => (
+                                        <tr key={i}>
+                                            <td>2024-03-{20 - i}</td>
+                                            <td>10:00 AM</td>
+                                            <td>{25 + Math.floor(Math.random() * 5)}</td>
+                                            <td>{Math.floor(Math.random() * 5)}</td>
+                                            <td>{Math.floor(85 + Math.random() * 15)}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 添加已注册学生列表模态框 */}
+            {showEnrolledStudents && (
+                <div className="modal-overlay" onClick={handleCloseEnrolledStudents}>
+                    <div className="enrolled-students-modal" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={handleCloseEnrolledStudents}>×</button>
+                        <h2>Enrolled Students</h2>
+                        <div className="enrolled-stats">
+                            <div className="stat-item">
+                                <h4>Total Enrolled</h4>
+                                <span>{selectedCourse.enrolled}</span>
+                            </div>
+                            <div className="stat-item">
+                                <h4>Available Seats</h4>
+                                <span>{selectedCourse.capacity - selectedCourse.enrolled}</span>
+                            </div>
+                            <div className="stat-item">
+                                <h4>Enrollment Rate</h4>
+                                <span>{Math.round((selectedCourse.enrolled / selectedCourse.capacity) * 100)}%</span>
+                            </div>
+                        </div>
+                        <div className="enrolled-table-container">
+                            <table className="enrolled-table">
+                                <thead>
                                     <tr>
-                                        <td>2024-03-20</td>
-                                        <td>10:00 AM</td>
-                                        <td>28</td>
-                                        <td>2</td>
-                                        <td>93%</td>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Enrollment Date</th>
+                                        <th>Status</th>
                                     </tr>
-                                    <tr>
-                                        <td>2024-03-18</td>
-                                        <td>10:00 AM</td>
-                                        <td>25</td>
-                                        <td>5</td>
-                                        <td>83%</td>
-                                    </tr>
-                                    {/* 可以添加更多行 */}
+                                </thead>
+                                <tbody>
+                                    {/* 示例数据 */}
+                                    {Array.from({ length: 15 }, (_, i) => (
+                                        <tr key={i}>
+                                            <td>2024{String(i + 1).padStart(4, '0')}</td>
+                                            <td>Student {i + 1}</td>
+                                            <td>2024-03-{String(i + 1).padStart(2, '0')}</td>
+                                            <td>
+                                                <span className="status-active">Active</span>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -224,7 +286,7 @@ const Courses = () => {
             )}
 
             {/* 原有的课程详情模态框 */}
-            {isModalOpen && selectedCourse && !showQRCode && !showAttendanceList && (
+            {isModalOpen && selectedCourse && !showQRCode && !showAttendanceList && !showEnrolledStudents && (
                 <div className="modal-overlay" onClick={handleCloseModal}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={handleCloseModal}>×</button>
@@ -254,6 +316,12 @@ const Courses = () => {
                             </div>
                         </div>
                         <div className="modal-actions">
+                            <button 
+                                className="modal-btn enrolled"
+                                onClick={handleViewEnrolledStudents}
+                            >
+                                Enrolled Students
+                            </button>
                             <button 
                                 className="modal-btn enroll"
                                 onClick={handleViewAttendance}

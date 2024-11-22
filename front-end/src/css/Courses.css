@@ -36,49 +36,105 @@
 
 .course-card {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
 }
 
 .course-card h3 {
     margin: 0 0 15px 0;
-    color: #333;
+    color: #2d3748;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 .course-info {
     margin-bottom: 15px;
+    display: grid;
+    gap: 12px;
 }
 
 .course-info p {
-    margin: 8px 0;
-    color: #666;
+    margin: 0;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
 }
 
 .course-info i {
-    margin-right: 8px;
+    margin-right: 10px;
+    color: #667eea;
+    width: 20px;
+    text-align: center;
+}
+
+.course-type-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f7fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #667eea;
 }
 
-.enroll-btn {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
+.course-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #718096;
 }
 
-.enroll-btn:hover {
-    opacity: 0.9;
+.course-seats {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-progress {
+    flex: 1;
+    margin: 0 10px;
+    height: 4px;
+    background: #edf2f7;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 
 @media (max-width: 768px) {
@@ -243,8 +299,11 @@
     border-radius: 8px;
     width: 90%;
     max-width: 900px;
+    max-height: 90vh;
     position: relative;
     animation: modalSlideIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 .attendance-stats {
@@ -274,13 +333,50 @@
 
 .attendance-table-container {
     margin-top: 20px;
-    overflow-x: auto;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: calc(90vh - 250px);
+}
+
+.attendance-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.attendance-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.attendance-table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.attendance-table-container::-webkit-scrollbar-thumb:hover {
+    background: #666;
 }
 
 .attendance-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.attendance-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: white;
+}
+
+.attendance-table th {
+    background-color: #f8f9fa;
+    color: #666;
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #eee;
 }
 
 .attendance-table th,
@@ -290,16 +386,82 @@
     border-bottom: 1px solid #eee;
 }
 
-.attendance-table th {
-    background-color: #f8f9fa;
-    color: #666;
-    font-weight: 600;
-}
-
 .attendance-table tr:hover {
     background-color: #f8f9fa;
 }
 
 .attendance-table td {
     color: #666;
+}
+
+.enrolled-students-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.enrolled-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.enrolled-table-container {
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: calc(90vh - 250px);
+}
+
+.enrolled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.enrolled-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: white;
+}
+
+.enrolled-table th,
+.enrolled-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.enrolled-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-active {
+    background-color: #4CAF50;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.modal-btn.enrolled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.modal-btn.enroll {
+    background: linear-gradient(135deg, #764ba2 0%, #20b16e 100%);
+}
+
+.modal-btn.attendance {
+    background: linear-gradient(135deg, #20b16e 0%, #667eea 100%);
 } 
