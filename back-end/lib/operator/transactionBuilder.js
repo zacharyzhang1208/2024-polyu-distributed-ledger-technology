@@ -42,8 +42,9 @@ class TransactionBuilder {
         return this;
     }
 
-    type(type) {
+    setType(type) {
         this.type = type;
+        return this;
     }
 
     ////////////////////////////////
