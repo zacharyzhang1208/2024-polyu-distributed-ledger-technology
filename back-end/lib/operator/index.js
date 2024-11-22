@@ -98,12 +98,22 @@ class Operator {
 
         if (secretKey == null) throw new ArgumentError(`Secret key not found with Wallet id '${walletId}' and address '${fromAddressId}'`);
         // 构建metadata
-        let metadata = {
+        let metadataContent = {
             category: 'attendance',
             studentId: studentId,
             activityId: courseId, 
             verifyCode: verifyCode,
             timestamp: new Date().getTime()
+        };
+        // 使用 CryptoUtil 加密 metadata
+        const metadataString = JSON.stringify(metadataContent);
+        const metadataHash = CryptoUtil.hash(metadataString);
+    
+        // 使用私钥签名
+        const signature = CryptoEdDSAUtil.signMessage(secretKey, metadataHash);
+        let metadata = {
+            ...metadataContent,
+            hash: signature  // 添加签名作为 hash
         };
         let tx = new TransactionBuilder();
         tx.from(utxo);
@@ -118,25 +128,38 @@ class Operator {
     }
 
     // 注册交易，注册后实现将学生ID和公钥上传到区块链
-    createRegisterTransaction(walletId, fromAddressId, toAddressId, studentId, publicKey) {
+    createRegisterTransaction(walletId, fromAddressId, toAddressId, studentId, publicKey,power=0,amount=0) {
         let utxo = this.blockchain.getUnspentTransactionsForAddress(fromAddressId);
         let wallet = this.getWalletById(walletId);
-
+        console.log(walletId);
+        console.log("this");
         if (wallet == null) throw new ArgumentError(`Wallet not found with id '${walletId}'`);
         // 这里以后要改成自己输入密钥
         let secretKey = wallet.getSecretKeyByAddress(fromAddressId);
 
         if (secretKey == null) throw new ArgumentError(`Secret key not found with Wallet id '${walletId}' and address '${fromAddressId}'`);
         // 构建metadata
-        let metadata = {
+        let metadataContent = {
             category: 'register',
             studentId: studentId,
             publicKey: publicKey,
+            power: power,
             timestamp: new Date().getTime()
         };
+        // 使用 CryptoUtil 加密 metadata
+        const metadataString = JSON.stringify(metadataContent);
+        const metadataHash = CryptoUtil.hash(metadataString);
+    
+        // 使用私钥签名
+        const signature = CryptoEdDSAUtil.signMessage(secretKey, metadataHash);
+        let metadata = {
+            ...metadataContent,
+            hash: signature  // 添加签名作为 hash
+        };
+
         let tx = new TransactionBuilder();
         tx.from(utxo);
-        tx.to(toAddressId, 0);
+        tx.to(toAddressId, amount);
         tx.change(fromAddressId);
         tx.fee(Config.FEE_PER_TRANSACTION);
         tx.setType('register');  // 设置交易类型
@@ -214,24 +237,27 @@ class Operator {
         return Transaction.fromJson(tx.build());
     }
 
-    createStudentWallet(password) {
-          // 1. 创建钱包
-          let wallet = this.createWalletFromPassword(password);
-          console.log(wallet.id);
-        
-          // 2. 为钱包生成地址(这个地址将作为学生的公钥)
-          let address = this.generateAddressForWallet(wallet.id);
-          console.log(address);
-          // 3. 获取私钥
-          let secretKey = wallet.getSecretKeyByAddress(address);
-          console.log(secretKey);
+    createWallet(password) {
+        // 1. 创建钱包
+        let wallet = this.createWalletFromPassword(password);
+        // console.log(wallet.id);
+    
+        // 2. 为钱包生成地址(这个地址将作为学生的公钥)
+        let address = this.generateAddressForWallet(wallet.id);
+        // console.log(address);
+        // 3. 获取私钥
+        let secretKey = wallet.getSecretKeyByAddress(address);
+        // console.log(secretKey);
+        // 保存钱包
 
-          return {
-            walletId: wallet.id,
-            publicKey: address,
-            secretKey: secretKey
-          }
-         
+       
+
+        return {
+        walletId: wallet.id,
+        publicKey: address,
+        secretKey: secretKey
+        }
+        
     }
 
 

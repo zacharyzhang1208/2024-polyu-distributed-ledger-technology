@@ -7,5 +7,4 @@ function main() {
     root.render(<App />);
 }
 
-main();//add notesss
-
+main()

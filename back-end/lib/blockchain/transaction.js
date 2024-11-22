@@ -45,12 +45,15 @@ class Transaction {
             metadata: {
                 category: null,    // 类别
                 studentId: null,   // 学生ID
+                teacherId: null,   // 教师ID
                 activityId: null,  // 课程验证码
                 verifyCode: null,  // 验证码
                 timestamp: null,   // 时间戳
                 courseId: null,    // 课程ID 
                 timeRange: null,   // 时间范围
                 publicKey: null,   // 公钥
+                power: null,       // 权限
+                hash: null,        // 哈希值
             }
         };
         // this.data = null;
