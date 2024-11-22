@@ -12,7 +12,46 @@ import '../../css/Courses.css';
 const coursesData = [
     {
         id: 1,
-        name: 'Introduction to Computer Science',
+        name: 'Computer Science COMP5500',
+        instructor: 'Dr. Smith',
+        credits: 3,
+        semester: 'Fall 2023',
+        description: 'An introduction to the basic concepts of computer programming and computer science.',
+        prerequisites: 'None',
+        schedule: 'Mon/Wed 10:00-11:30',
+        location: 'Room 101',
+        capacity: 30,
+        enrolled: 25
+    },
+    {
+        id: 2,
+        name: 'Computer Science COMP5501',
+        instructor: 'Dr. Smith',
+        credits: 3,
+        semester: 'Fall 2023',
+        description: 'An introduction to the basic concepts of computer programming and computer science.',
+        prerequisites: 'None',
+        schedule: 'Mon/Wed 10:00-11:30',
+        location: 'Room 101',
+        capacity: 30,
+        enrolled: 25
+    },
+    {
+        id: 4,
+        name: 'Computer Science COMP5503',
+        instructor: 'Dr. Smith',
+        credits: 3,
+        semester: 'Fall 2023',
+        description: 'An introduction to the basic concepts of computer programming and computer science.',
+        prerequisites: 'None',
+        schedule: 'Mon/Wed 10:00-11:30',
+        location: 'Room 101',
+        capacity: 30,
+        enrolled: 25
+    },
+    {
+        id: 3,
+        name: 'Computer Science COMP5504',
         instructor: 'Dr. Smith',
         credits: 3,
         semester: 'Fall 2023',
