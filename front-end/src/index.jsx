@@ -7,5 +7,4 @@ function main() {
     root.render(<App />);
 }
 
-main(); //主入口函数
-
+main()
