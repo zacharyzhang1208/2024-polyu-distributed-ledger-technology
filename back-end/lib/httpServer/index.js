@@ -172,6 +172,117 @@ class HttpServer {
             }
         });
 
+        // 考勤交易
+        this.app.post('/operator/wallets/:walletId/attendance', (req, res) => {
+            // 请求钱包ID和密码
+            let walletId = req.params.walletId;
+            let password = req.headers.password;
+
+            if (password == null) throw new HTTPError(401, 'Wallet\'s password is missing.');
+            let passwordHash = CryptoUtil.hash(password);
+
+            try {
+                // 检查钱包ID和密码
+                if (!operator.checkWalletPassword(walletId, passwordHash)) throw new HTTPError(403, `Invalid password for wallet '${walletId}'`);
+                // 创建考勤交易
+                let newTransaction = operator.createAttendanceTransaction(walletId, req.body.fromAddress, req.body.toAddress, 
+                                                                            req.body.studentId, req.body.courseId, req.body.verifyCode);
+                
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send(transactionCreated);
+            } catch (ex) {
+                if (ex instanceof ArgumentError || ex instanceof TransactionAssertionError) throw new HTTPError(400, ex.message, walletId, ex);
+                else throw ex;
+            }
+        });
+
+        // 注册交易
+        this.app.post('/operator/wallets/:walletId/register', (req, res) => {
+            // 请求钱包ID和密码
+            let walletId = req.params.walletId;
+            let password = req.headers.password;
+
+            if (password == null) throw new HTTPError(401, 'Wallet\'s password is missing.');
+            let passwordHash = CryptoUtil.hash(password);
+
+            try {
+                // 检查钱包ID和密码
+                if (!operator.checkWalletPassword(walletId, passwordHash)) throw new HTTPError(403, `Invalid password for wallet '${walletId}'`);
+                // 创建考勤交易
+                let newTransaction = operator.createRegisterTransaction(walletId, req.body.fromAddress, 
+                                                                    req.body.toAddress, req.body.studentId, req.body.publicKey);
+                
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send(transactionCreated);
+            } catch (ex) {
+                if (ex instanceof ArgumentError || ex instanceof TransactionAssertionError) throw new HTTPError(400, ex.message, walletId, ex);
+                else throw ex;
+            }
+
+        });
+
+        // Course发布交易
+        this.app.post('/operator/wallets/:walletId/course', (req, res) => {
+            // 请求钱包ID和密码
+            let walletId = req.params.walletId;
+            let password = req.headers.password;
+
+            if (password == null) throw new HTTPError(401, 'Wallet\'s password is missing.');
+            let passwordHash = CryptoUtil.hash(password);
+
+            try {
+                // 检查钱包ID和密码
+                if (!operator.checkWalletPassword(walletId, passwordHash)) throw new HTTPError(403, `Invalid password for wallet '${walletId}'`);
+                // 创建考勤交易
+                let newTransaction = operator.createCourseTransaction(walletId, req.body.fromAddress, 
+                                                                    req.body.toAddress, req.body.teacherId,req.body.courseId, req.body.publicKey);
+            
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send(transactionCreated);
+            } catch (ex) {
+                if (ex instanceof ArgumentError || ex instanceof TransactionAssertionError) throw new HTTPError(400, ex.message, walletId, ex);
+                else throw ex;
+            }
+
+        });
+        // Lesson发布交易
+        this.app.post('/operator/wallets/:walletId/lesson', (req, res) => {
+            // 请求钱包ID和密码
+            let walletId = req.params.walletId;
+            let password = req.headers.password;
+
+            if (password == null) throw new HTTPError(401, 'Wallet\'s password is missing.');
+            let passwordHash = CryptoUtil.hash(password);
+
+            try {
+                // 检查钱包ID和密码
+                if (!operator.checkWalletPassword(walletId, passwordHash)) throw new HTTPError(403, `Invalid password for wallet '${walletId}'`);
+                // 创建考勤交易
+                let newTransaction = operator.createLessonTransaction(walletId, req.body.fromAddress, 
+                                                                    req.body.toAddress, req.body.teacherId,
+                                                                    req.body.courseId,req.body.activityId,
+                                                                    req.body.verifyCode, req.body.start, req.body.end, req.body.publicKey); 
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send(transactionCreated);
+            } catch (ex) {
+                if (ex instanceof ArgumentError || ex instanceof TransactionAssertionError) throw new HTTPError(400, ex.message, walletId, ex);
+                else throw ex;
+            }
+
+        });
+
         this.app.get('/operator/wallets/:walletId/addresses', (req, res) => {
             let walletId = req.params.walletId;
             try {

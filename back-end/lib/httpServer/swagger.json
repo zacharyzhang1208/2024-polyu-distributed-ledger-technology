@@ -487,6 +487,88 @@
                 }
             }
         },
+        "/operator/wallets/{walletId}/attendance": {
+            "post": {
+                "tags": [
+                    "operator"
+                ],
+                "summary": "Create a new transaction",
+                "description": "Create a new attendance transaction for student check-in",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "walletId",
+                        "description": "Wallet id",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "password",
+                        "description": "Wallet password",
+                        "required": true,
+                        "type": "string",
+                        "format": "password"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Attendance transaction to be created",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "fromAddress",
+                                "toAddress",
+                                "studentId",
+                                "activityId",
+                                "verifyCode"
+                            ],
+                            "properties": {
+                                "fromAddress": {
+                                    "type": "string",
+                                    "description": "From address"
+                                },
+                                "toAddress": {
+                                    "type": "string",
+                                    "description": "To address"
+                                },
+                                "studentId": {
+                                    "type": "string",
+                                    "description": "Student ID"
+                                },
+                                "activityId": {
+                                    "type": "string",
+                                    "description": "Course ID"
+                                },
+                                "verifyCode": {
+                                    "type": "string",
+                                    "description": "Verify code"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+    
         "/operator/{addressId}/balance": {
             "get": {
                 "tags": [
