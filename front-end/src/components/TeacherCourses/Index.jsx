@@ -287,22 +287,13 @@ const TeacherCourses = () => {
                             </div>
                         </div>
                         <div className="modal-actions">
-                            <button 
-                                className="modal-btn enrolled"
-                                onClick={handleViewEnrolledStudents}
-                            >
+                            <button className="modal-btn enrolled" onClick={handleViewEnrolledStudents}>
                                 Enrolled Students
                             </button>
-                            <button 
-                                className="modal-btn enroll"
-                                onClick={handleViewAttendance}
-                            >
+                            <button className="modal-btn enroll" onClick={handleViewAttendance}>
                                 Attendance Situation
                             </button>
-                            <button 
-                                className="modal-btn attendance"
-                                onClick={handleCreateAttendance}
-                            >
+                            <button className="modal-btn attendance" onClick={handleCreateAttendance}>
                                 Create Attendance
                             </button>
                         </div>
