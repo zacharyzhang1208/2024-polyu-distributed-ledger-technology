@@ -1,13 +1,13 @@
 const supertest = require('supertest');
-const HttpServer = require('./lib/httpServer');
-const Blockchain = require('./lib/blockchain');
-const Operator = require('./lib/operator');
-const Miner = require('./lib/miner');
-const Node = require('./lib/node');
+const HttpServer = require('../lib/httpServer/index.js');
+const Blockchain = require('../lib/blockchain/index.js');
+const Operator = require('../lib/operator/index.js');
+const Miner = require('../lib/miner/index.js');
+const Node = require('../lib/node/index.js');
 const fs = require('fs-extra');
 
 const logLevel = 0;
-require('./lib/util/consoleWrapper.js')('testApi', logLevel);
+require('../lib/util/consoleWrapper.js')('testApi', logLevel);
 
 const walletPassword = 't t t t t';
 let context = {};
