@@ -1,4 +1,4 @@
-.courses-controls {
+.search-bar {
     display: flex;
     gap: 10px;
 }
@@ -16,13 +16,3 @@
     border-radius: 4px;
     background-color: white;
 }
-
-@media (max-width: 768px) {
-    .courses-controls {
-        flex-direction: column;
-    }
-
-    .search-input {
-        width: 100%;
-    }
-} 

@@ -9,45 +9,10 @@
     margin-bottom: 20px;
 }
 
-.courses-controls {
-    display: flex;
-    gap: 10px;
-}
-
-.search-input {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 250px;
-}
-
-.sort-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-}
-
 .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
-}
-
-@media (max-width: 768px) {
-    .courses-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-
-    .courses-controls {
-        flex-direction: column;
-    }
-
-    .search-input {
-        width: 100%;
-    }
 }
 
 .modal-overlay {

@@ -3,7 +3,7 @@ import '../../css/SearchBar.css';
 
 const SearchBar = ({ searchTerm, onSearch, sortBy, onSort }) => {
     return (
-        <div className="courses-controls">
+        <div className="search-bar">
             <input
                 type="text"
                 placeholder="Search courses..."
