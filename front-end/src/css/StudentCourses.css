@@ -1,3 +1,76 @@
 .modal-btn.checkin {
-    background: linear-gradient(135deg, #764ba2 0%, #4d6aa8 100%);
+    background: linear-gradient(135deg, #20b16e 0%, #667eea 100%);
+    width: 50%;
+    margin: 0 auto;
+}
+
+.checkin-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.checkin-content {
+    margin-top: 20px;
+}
+
+.checkin-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.checkin-info p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.checkin-form {
+    margin: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.checkin-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.checkin-submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #20b16e 0%, #667eea 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.checkin-submit-btn:hover {
+    opacity: 0.9;
+}
+
+.checkin-status {
+    margin-top: 15px;
+    text-align: center;
+    color: #666;
 }
