@@ -1,0 +1,189 @@
+.courses-container {
+    padding: 20px;
+}
+
+.courses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.courses-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 250px;
+}
+
+.sort-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.course-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.course-card h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+.course-info {
+    margin-bottom: 15px;
+}
+
+.course-info p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.course-info i {
+    margin-right: 8px;
+    color: #667eea;
+}
+
+.enroll-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.enroll-btn:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .courses-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .courses-controls {
+        flex-direction: column;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.info-section {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.info-section h3 {
+    margin-top: 0;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.info-section p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.modal-enroll-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.modal-enroll-btn:hover {
+    opacity: 0.9;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+} 
