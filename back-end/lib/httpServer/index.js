@@ -13,23 +13,14 @@ const HTTPError = require('./httpError');
 const ArgumentError = require('../util/argumentError');
 const CryptoUtil = require('../util/cryptoUtil');
 const timeago = require('timeago.js');
+const projectWallet = require('../operator/projectWallet');
 
 class HttpServer {
     constructor(node, blockchain, operator, miner) {
         this.app = express();
         this.app.use(cors()); //处理CORS问题
 
-        const projectWallet = (wallet) => {
-            return {
-                id: wallet.id,
-                addresses: R.map((keyPair) => {
-                    return keyPair.publicKey;
-                }, wallet.keyPairs)
-            };
-        };
-
         this.app.use(bodyParser.json());
-
         this.app.set('view engine', 'pug');
         this.app.set('views', path.join(__dirname, 'views'));
         this.app.locals.formatters = {
