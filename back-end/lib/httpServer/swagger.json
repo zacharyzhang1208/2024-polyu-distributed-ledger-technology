@@ -568,7 +568,72 @@
                 }
             }
         },
-    
+        "/operator/studentRegister": {
+            "post": {
+                "tags": [
+                    "operator"
+                ],
+                "summary": "Register new student",
+                "description": "Create wallet and register student with ID and password",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Student registration information",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "studentId",
+                                "password"
+                            ],
+                            "properties": {
+                                "studentId": {
+                                    "type": "string",
+                                    "description": "Student ID number"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "Student password",
+                                    "format": "password"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "student": {
+                                    "type": "object",
+                                    "properties": {
+                                        "walletId": {
+                                            "type": "string"
+                                        },
+                                        "publicKey": {
+                                            "type": "string"
+                                        },
+                                        "secretKey": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "transactionCreated": {
+                                    "$ref": "#/definitions/Transaction"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input parameters"
+                    }
+                }
+            }
+        },
+        
         "/operator/{addressId}/balance": {
             "get": {
                 "tags": [

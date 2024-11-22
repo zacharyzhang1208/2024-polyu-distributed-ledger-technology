@@ -12,6 +12,7 @@ const HTTPError = require('./httpError');
 const ArgumentError = require('../util/argumentError');
 const CryptoUtil = require('../util/cryptoUtil');
 const timeago = require('timeago.js');
+const Config = require('../config'); 
 
 class HttpServer {
     constructor(node, blockchain, operator, miner) {
@@ -210,6 +211,7 @@ class HttpServer {
 
             try {
                 // 检查钱包ID和密码
+                
                 if (!operator.checkWalletPassword(walletId, passwordHash)) throw new HTTPError(403, `Invalid password for wallet '${walletId}'`);
                 // 创建考勤交易
                 let newTransaction = operator.createRegisterTransaction(walletId, req.body.fromAddress, 
@@ -281,6 +283,61 @@ class HttpServer {
                 else throw ex;
             }
 
+        });
+
+        //注册，输入学号/职工号和密码和类别0是学生1是老师，返回公钥和私钥
+        this.app.post('/operator/studentRegister', (req, res) => {
+            let studentId = req.body.studentId;
+            let password = req.body.password;
+            let power = req.body.power;
+            //这里可以添加数据库逻辑
+
+            try {
+                let student = operator.createWallet(password);
+                let faucetAddress = Config.FAUCET_ADDRESS;
+                console.log("sign");
+                console.log(student.walletId);
+                // 50为初始余额
+                let faucetWalletId = Config.FAUCET_WALLET_ID;
+                let newTransaction = operator.createRegisterTransaction(faucetWalletId, faucetAddress, student.publicKey, 
+                                                                        studentId, student.publicKey, power, 50);
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send({student, transactionCreated});
+
+            }catch(ex){
+                if (ex instanceof ArgumentError) throw new HTTPError(400, ex.message, studentId, ex);
+                else throw ex;
+            }
+        });
+
+         //教师注册课程，输入教师号和密码，返回公钥和私钥（还没写）
+         this.app.post('/operator/teacherRegister', (req, res) => {
+            let teacherId = req.body.teacherId;
+            let password = req.body.password;
+            //这里可以添加数据库逻辑
+
+            try {
+                let student = operator.createStudentWallet(password);
+                let faucetAddress = Config.FAUCET_ADDRESS;
+                console.log("sign");
+                console.log(student.walletId);
+                // 50为初始余额
+                let faucetWalletId = Config.FAUCET_WALLET_ID;
+                let newTransaction = operator.createRegisterTransaction(faucetWalletId, faucetAddress, student.publicKey, 
+                                                                        studentId, student.publicKey, 50);
+                // 检查交易
+                newTransaction.check();
+
+                let transactionCreated = blockchain.addTransaction(Transaction.fromJson(newTransaction));
+                res.status(201).send({student, transactionCreated});
+
+            }catch(ex){
+                if (ex instanceof ArgumentError) throw new HTTPError(400, ex.message, studentId, ex);
+                else throw ex;
+            }
         });
 
         this.app.get('/operator/wallets/:walletId/addresses', (req, res) => {
