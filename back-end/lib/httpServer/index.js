@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const R = require('ramda');
 const path = require('path');
+const cors = require('cors');
 const swaggerDocument = require('./swagger.json');
 const Block = require('../blockchain/block');
 const Transaction = require('../blockchain/transaction');
@@ -16,6 +17,7 @@ const timeago = require('timeago.js');
 class HttpServer {
     constructor(node, blockchain, operator, miner) {
         this.app = express();
+        this.app.use(cors()); //处理CORS问题
 
         const projectWallet = (wallet) => {
             return {
