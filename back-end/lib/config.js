@@ -1,7 +1,7 @@
 // Do not change these configurations after the blockchain is initialized
 module.exports = {
     // INFO: The mining reward could decreases over time like bitcoin. See https://en.bitcoin.it/wiki/Mining#Reward.
-    MINING_REWARD: 5000000000,
+    MINING_REWARD: 1,
     // INFO: Usually it's a fee over transaction size (not quantity)
     FEE_PER_TRANSACTION: 0,
     FAUCET_WALLET_ID: "bae2d59ebaf1e5d40443662ae3730b65418477ee5f80471a0b3a4d513409ec34",

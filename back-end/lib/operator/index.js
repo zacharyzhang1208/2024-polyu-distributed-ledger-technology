@@ -132,7 +132,7 @@ class Operator {
         return Transaction.fromJson(tx.build());
     }
 
-    // ���生注册交易，注册后实现将学生ID和公钥上传到区块链
+    // 生注册交易，注册后实现将学生ID和公钥上传到区块链
     //水龙头会自动给学生50元
     createStudentRegisterTransaction(walletId, fromAddressId, toAddressId, studentId, publicKey,
                                 encryptedSecretKey,power=0,amount=0) {
@@ -490,15 +490,16 @@ class Operator {
         if (!teacherId) {
             throw new ArgumentError('teacherId is required');
         }
-        let allTransactions = blockchain.getAllTransactions();
-                
+
+        let allTransactions = this.blockchain.getAllTransactions();
+        
         // 查找所有该教师注册的课程
         const teacherCourses = allTransactions
             .filter(transaction => {
                 return transaction.type === 'course' && 
-                        transaction.data && 
-                        transaction.data.metadata && 
-                        transaction.data.metadata.teacherId === teacherId;
+                       transaction.data && 
+                       transaction.data.metadata && 
+                       transaction.data.metadata.teacherId === teacherId;
             })
             .map(transaction => {
                 const metadata = transaction.data.metadata;

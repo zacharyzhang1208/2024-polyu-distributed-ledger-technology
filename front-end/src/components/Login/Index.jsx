@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { USER_TYPES, DEFAULT_ROUTES } from '../../constants/userTypes';
-import { checkStudentRegistration, registerStudent, registerTeacher } from '../../services/api';
+import { checkStudentRegistration, checkTeacherRegistration, registerStudent, registerTeacher } from '../../services/api';
 import '../../css/Login.css';
 
 const Login = ({ onLogin }) => {

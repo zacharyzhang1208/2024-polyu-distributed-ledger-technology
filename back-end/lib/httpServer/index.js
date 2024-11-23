@@ -514,80 +514,98 @@ class HttpServer {
         ////////////////// 查询考勤记录
         this.app.get('/query/attendance', (req, res) => {
             try {
-                // 从查询参数中获取数据
-                const { studentId, courseId, startDate, endDate } = req.query;
+                const { courseId, studentId, startDate, endDate } = req.query;
                 
+                // 参数验证
                 if (!courseId) {
-                    throw new Error('必须提供 courseId');
+                    throw new Error('courseId is required');
                 }
-                
-                // 将 "20240215" 转换为 Date 对象
-                const parseQueryDate = (dateStr) => {
-                    if (!dateStr) return null;
-                    const year = dateStr.substring(0, 4);
-                    const month = dateStr.substring(4, 6);
-                    const day = dateStr.substring(6, 8);
-                    return new Date(year, month - 1, day);
-                };
 
-                const startDateTime = parseQueryDate(startDate);
-                const endDateTime = endDate ? parseQueryDate(endDate) : null;
-                if (endDateTime) {
-                    endDateTime.setHours(23, 59, 59, 999);
-                }
-                
                 let allTransactions = blockchain.getAllTransactions();
                 
+                // 筛选考勤记录
                 let attendanceRecords = allTransactions
                     .filter(transaction => {
-                        // 获取交易的元数据
                         const metadata = transaction.data?.metadata;
-                        
-                        // 基本检查：必须是考勤类型的交易
-                        if (!metadata || 
-                            transaction.type !== 'attendance' || 
-                            metadata.category !== 'attendance') {
-                            return false;
+                        let isMatch = transaction.type === 'attendance' && 
+                                    metadata?.category === 'attendance' && 
+                                    metadata?.courseId === courseId;
+
+                        // 如果提供了学生ID，进一步筛选
+                        if (isMatch && studentId) {
+                            isMatch = metadata.studentId === studentId;
                         }
-                        
-                        // 检查课程ID
-                        if (metadata.courseId !== courseId) {
-                            return false;
+
+                        // 如果提供了日期范围，进一步筛选
+                        if (isMatch && (startDate || endDate)) {
+                            const recordDate = new Date(metadata.timestamp);
+                            if (startDate && new Date(startDate) > recordDate) return false;
+                            if (endDate && new Date(endDate) < recordDate) return false;
                         }
-                        
-                        // 如果提供了学生ID，则检查学生ID
-                        if (studentId && metadata.studentId !== studentId) {
-                            return false;
-                        }
-                        
-                        // 如果提供了时间范围，则检查时间
-                        if (startDateTime || endDateTime) {
-                            const txDate = new Date(metadata.timestamp);
-                            if (startDateTime && txDate < startDateTime) return false;
-                            if (endDateTime && txDate > endDateTime) return false;
-                        }
-                        
-                        return true;
+
+                        return isMatch;
                     })
                     .map(transaction => {
                         const metadata = transaction.data.metadata;
                         return {
                             studentId: metadata.studentId,
                             courseId: metadata.courseId,
+                            verifyCode: metadata.verifyCode,
                             timestamp: metadata.timestamp,
-                            verifyCode: metadata.verifyCode
+                            status: 'Present',  // 如果有考勤记录就是出席
+                            checkInTime: new Date(metadata.timestamp).toLocaleTimeString()
                         };
                     });
 
-                // 按时间排序
-                attendanceRecords.sort((a, b) => b.timestamp - a.timestamp);
+                // 如果是查询特定学生，计算出勤率
+                if (studentId) {
+                    // 获取该课程的所有考勤时间点
+                    const allClassDates = [...new Set(attendanceRecords.map(r => 
+                        new Date(r.timestamp).toLocaleDateString()
+                    ))];
 
-                res.status(200).send({
-                    total: attendanceRecords.length,
-                    records: attendanceRecords
-                });
+                    const attendanceRate = (attendanceRecords.length / allClassDates.length) * 100;
+
+                    res.status(200).send({
+                        success: true,
+                        total: attendanceRecords.length,
+                        totalClasses: allClassDates.length,
+                        attendanceRate: Math.round(attendanceRate),
+                        records: attendanceRecords
+                    });
+                } else {
+                    // 按日期分组统计
+                    const groupedRecords = attendanceRecords.reduce((acc, record) => {
+                        const date = new Date(record.timestamp).toLocaleDateString();
+                        if (!acc[date]) {
+                            acc[date] = {
+                                date,
+                                totalStudents: 0,
+                                presentCount: 0,
+                                absentCount: 0,
+                                timestamp: record.timestamp,
+                                students: []
+                            };
+                        }
+                        acc[date].totalStudents++;
+                        acc[date].presentCount++;
+                        acc[date].students.push(record);
+                        acc[date].attendanceRate = Math.round((acc[date].presentCount / acc[date].totalStudents) * 100);
+                        return acc;
+                    }, {});
+
+                    res.status(200).send({
+                        success: true,
+                        total: Object.keys(groupedRecords).length,
+                        records: Object.values(groupedRecords)
+                    });
+                }
+                
             } catch (ex) {
-                throw new HTTPError(400, ex.message);
+                res.status(400).send({
+                    success: false,
+                    message: ex.message
+                });
             }
         });
         ////////////////// 查询学生是否注册
@@ -663,21 +681,26 @@ class HttpServer {
                 
                 // 参数验证
                 if (!teacherId) {
-                    throw new Error('teacherId 是必需的参数');
+                    throw new Error('teacherId is required');
                 }
 
-               
+                // 调用 operator 中的方法获取教师课程
+                const teacherCourses = operator.getTeacherCourses(teacherId);
                 
-                // 查找所有该教师注册的课程
-                let teacherCourses = operator.getTeacherCourses(teacherId);
-
+                // 返回标准格式的 JSON 响应
                 res.status(200).send({
+                    success: true,
                     total: teacherCourses.length,
-                    courses: teacherCourses
+                    courses: teacherCourses,
+                    message: `Found ${teacherCourses.length} courses`
                 });
                 
             } catch (ex) {
-                throw new HTTPError(400, ex.message);
+                // 错误处理
+                res.status(400).send({
+                    success: false,
+                    message: ex.message
+                });
             }
         });
 

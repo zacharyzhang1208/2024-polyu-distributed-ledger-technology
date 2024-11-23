@@ -51,7 +51,15 @@ export const checkTeacherRegistration = async (teacherId) => {
 };
 
 export const getTeacherCourses = async (teacherId) => {
-    return createApiRequest(`${config.endpoints.teacherCourses}?teacherId=${teacherId}`);
+    try {
+        console.log('Fetching courses for teacher:', teacherId); // 调试日志
+        const response = await createApiRequest(`${config.endpoints.teacherCourses}?teacherId=${teacherId}`);
+        console.log('API response:', response); // 调试日志
+        return response;
+    } catch (error) {
+        console.error('Error fetching teacher courses:', error);
+        throw error;
+    }
 };
 
 export const getStudentEnrolledCourses = async (studentId) => {
@@ -60,4 +68,16 @@ export const getStudentEnrolledCourses = async (studentId) => {
 
 export const getCourseEnrolledStudents = async (courseId) => {
     return createApiRequest(`${config.endpoints.courseEnrolledStudents}?courseId=${courseId}`);
+};
+
+export const getCourseAttendance = async (params) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return createApiRequest(`${config.endpoints.courseAttendance}?${queryParams}`);
+};
+
+export const createLessonAttendance = async (data) => {
+    return createApiRequest(config.endpoints.createLesson, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
 }; 

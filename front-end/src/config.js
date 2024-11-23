@@ -5,7 +5,10 @@ const config = {
         checkTeacher: '/query/checkTeacher',
         studentRegister: '/operator/studentRegister',
         teacherRegister: '/operator/teacherRegister',
-        teacherCourses: '/query/teacherCourses'
+        teacherCourses: '/query/teacherCourses',
+        courseAttendance: '/query/attendance',
+        courseEnrolledStudents: '/query/courseEnrolledStudents',
+        createLesson: '/operator/lessonPublish'
     }
 };
 
