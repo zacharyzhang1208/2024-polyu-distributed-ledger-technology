@@ -75,6 +75,8 @@ const TeacherCourses = () => {
     const [attendanceCode, setAttendanceCode] = useState('');
     const [showAttendanceList, setShowAttendanceList] = useState(false);
     const [showEnrolledStudents, setShowEnrolledStudents] = useState(false);
+    const [showAttendanceDetail, setShowAttendanceDetail] = useState(false);
+    const [selectedAttendance, setSelectedAttendance] = useState(null);
 
     // 处理搜索
     const handleSearch = (e) => {
@@ -154,6 +156,18 @@ const TeacherCourses = () => {
         setShowEnrolledStudents(false);
     };
 
+    // 添加处理点击签到记录的函数
+    const handleAttendanceRowClick = (attendance) => {
+        setSelectedAttendance(attendance);
+        setShowAttendanceDetail(true);
+    };
+
+    // 关闭签到详情页面
+    const handleCloseAttendanceDetail = () => {
+        setShowAttendanceDetail(false);
+        setSelectedAttendance(null);
+    };
+
     return (
         <div className="courses-container">
             <div className="courses-header">
@@ -229,16 +243,34 @@ const TeacherCourses = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* 添加更多测试数据 */}
-                                    {Array.from({ length: 20 }, (_, i) => (
-                                        <tr key={i}>
-                                            <td>2024-03-{20 - i}</td>
-                                            <td>10:00 AM</td>
-                                            <td>{25 + Math.floor(Math.random() * 5)}</td>
-                                            <td>{Math.floor(Math.random() * 5)}</td>
-                                            <td>{Math.floor(85 + Math.random() * 15)}%</td>
-                                        </tr>
-                                    ))}
+                                    {Array.from({ length: 20 }, (_, i) => {
+                                        const attendance = {
+                                            date: `2024-03-${20 - i}`,
+                                            time: '10:00 AM',
+                                            present: 25 + Math.floor(Math.random() * 5),
+                                            absent: Math.floor(Math.random() * 5),
+                                            rate: Math.floor(85 + Math.random() * 15),
+                                            students: Array.from({ length: 30 }, (_, j) => ({
+                                                id: `2024${String(j + 1).padStart(4, '0')}`,
+                                                name: `Student ${j + 1}`,
+                                                status: Math.random() > 0.1 ? 'Present' : 'Absent',
+                                                checkInTime: '10:' + String(Math.floor(Math.random() * 30)).padStart(2, '0')
+                                            }))
+                                        };
+                                        return (
+                                            <tr 
+                                                key={i}
+                                                onClick={() => handleAttendanceRowClick(attendance)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <td>{attendance.date}</td>
+                                                <td>{attendance.time}</td>
+                                                <td>{attendance.present}</td>
+                                                <td>{attendance.absent}</td>
+                                                <td>{attendance.rate}%</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -295,8 +327,49 @@ const TeacherCourses = () => {
                 </div>
             )}
 
+            {/* 添加签到详情页面 */}
+            {showAttendanceDetail && selectedAttendance && (
+                <div className="modal-overlay" onClick={handleCloseAttendanceDetail}>
+                    <div className="attendance-detail-modal" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={handleCloseAttendanceDetail}>×</button>
+                        <h2>Attendance Detail</h2>
+                        <div className="attendance-detail-header">
+                            <p><strong>Date:</strong> {selectedAttendance.date}</p>
+                            <p><strong>Time:</strong> {selectedAttendance.time}</p>
+                            <p><strong>Attendance Rate:</strong> {selectedAttendance.rate}%</p>
+                        </div>
+                        <div className="attendance-detail-table-container">
+                            <table className="attendance-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>Check-in Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedAttendance.students.map((student, index) => (
+                                        <tr key={index}>
+                                            <td>{student.id}</td>
+                                            <td>{student.name}</td>
+                                            <td>
+                                                <span className={`status-badge ${student.status.toLowerCase()}`}>
+                                                    {student.status}
+                                                </span>
+                                            </td>
+                                            <td>{student.status === 'Present' ? student.checkInTime : '-'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* 原有的课程详情模态框 */}
-            {isModalOpen && selectedCourse && !showQRCode && !showAttendanceList && !showEnrolledStudents && (
+            {isModalOpen && selectedCourse && !showQRCode && !showAttendanceList && !showEnrolledStudents && !showAttendanceDetail && (
                 <div className="modal-overlay" onClick={handleCloseModal}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={handleCloseModal}>×</button>
