@@ -42,7 +42,6 @@ const Login = ({ onLogin }) => {
     
     if (isLogin) {
       setIsLoading(true);
-      
       try {
         // 模拟网络延迟
         await new Promise(resolve => setTimeout(resolve, 1500));
@@ -68,8 +67,7 @@ const Login = ({ onLogin }) => {
         setIsLoading(false);
       }
     } else {
-      // 注册逻辑保持不变
-      // ... 原有的注册代码 ...
+      // 注册逻辑
     }
   };
 
@@ -123,19 +121,13 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className={`submit-btn ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
-          >
+          <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`}disabled={isLoading}>
             {isLoading ? (
               <div className="loading-spinner">
                 <div className="spinner"></div>
                 <span>Logging in...</span>
               </div>
-            ) : (
-              isLogin ? 'Login' : 'Register'
-            )}
+            ) : (isLogin ? 'Login' : 'Register')}
           </button>
         </form>
 
