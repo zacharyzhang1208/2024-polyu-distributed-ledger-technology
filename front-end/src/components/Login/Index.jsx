@@ -6,6 +6,7 @@ import '../../css/Login.css';
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -40,34 +41,31 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     
     if (isLogin) {
-      // 模拟登录验证
-      const { username, password, userType } = formData;
+      setIsLoading(true);
       
-      // 根据用户类型选择验证数据
-      const users = userType === USER_TYPES.STUDENT ? mockUsers.students : mockUsers.teachers;
-      
-      // 查找用户
-      const user = users.find(u => u.id === username && u.password === password);
-      
-      if (user) {
-        // 登录成功
-        console.log('Login successful:', username);
+      try {
+        // 模拟网络延迟
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // 存储用户信息到 localStorage
-        localStorage.setItem('user', JSON.stringify({
-          id: username,
-          type: userType
-        }));
+        const { username, password, userType } = formData;
+        const users = userType === USER_TYPES.STUDENT ? mockUsers.students : mockUsers.teachers;
+        const user = users.find(u => u.id === username && u.password === password);
         
-        // 调用父组件的登录回调
-        onLogin(userType);
-        
-        // 根据用户类型跳转到对应的首页路由
-        const defaultRoute = DEFAULT_ROUTES[userType];
-        navigate(defaultRoute);
-      } else {
-        // 登录失败
-        setError('Invalid username or password');
+        if (user) {
+          console.log('Login successful:', username);
+          localStorage.setItem('user', JSON.stringify({
+            id: username,
+            type: userType
+          }));
+          onLogin(userType);
+          navigate(DEFAULT_ROUTES[userType]);
+        } else {
+          setError('Invalid username or password');
+        }
+      } catch (error) {
+        setError('Login failed. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     } else {
       // 注册逻辑保持不变
@@ -125,14 +123,25 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
-          <button type="submit" className="submit-btn">
-            {isLogin ? 'Login' : 'Register'}
+          <button 
+            type="submit" 
+            className={`submit-btn ${isLoading ? 'loading' : ''}`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="loading-spinner">
+                <div className="spinner"></div>
+                <span>Logging in...</span>
+              </div>
+            ) : (
+              isLogin ? 'Login' : 'Register'
+            )}
           </button>
         </form>
 
         <p className="switch-form">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <span onClick={() => setIsLogin(!isLogin)}>
+          <span onClick={() => !isLoading && setIsLogin(!isLogin)}>
             {isLogin ? 'Register' : 'Login'}
           </span>
         </p>
