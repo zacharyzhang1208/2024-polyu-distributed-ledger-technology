@@ -60,25 +60,57 @@ input::placeholder {
 }
 
 .submit-btn {
+  position: relative;
   width: 100%;
-  padding: 0.8rem;
+  padding: 12px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 4px;
+  font-size: 16px;
   cursor: pointer;
-  margin-top: 1.5rem;
   transition: all 0.3s ease;
 }
 
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+.submit-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
 }
 
-.submit-btn:active {
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.submit-btn.loading {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: none;
 }
 
 .switch-form {
@@ -101,23 +133,6 @@ input::placeholder {
   text-decoration: underline;
 }
 
-/* 添加响应式设计 */
-@media (max-width: 480px) {
-  .login-box {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-
-  input {
-    padding: 0.7rem;
-  }
-}
-
-/* 在现有样式中添加 */
 .user-type-select {
   width: 100%;
   padding: 0.8rem;
@@ -138,5 +153,15 @@ input::placeholder {
 
 .user-type-select option {
   padding: 0.8rem;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    text-align: center;
 }
  

@@ -6,12 +6,14 @@ import '../../css/Login.css';
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     email: '',
     userType: USER_TYPES.STUDENT
   });
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,48 +21,53 @@ const Login = ({ onLogin }) => {
       ...formData,
       [name]: value
     });
+    // 清除错误信息
+    setError('');
+  };
+
+  // 模拟的用户数据
+  const mockUsers = {
+    students: [
+      { id: '2024001', password: '123456' },
+      { id: '2024002', password: '123456' }
+    ],
+    teachers: [
+      { id: 'teacher001', password: '123456' },
+      { id: 'teacher002', password: '123456' }
+    ]
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (isLogin) {
-      // 处理登录逻辑
-      console.log('login info:', formData);
-      
-      // 调用父组件的登录回调
-      onLogin(formData.userType);
-      
-      // 根据用户类型跳转到对应的首页路由
-      const defaultRoute = DEFAULT_ROUTES[formData.userType];
-      navigate(defaultRoute);
-    } else {
-      // 处理注册逻辑
-      console.log('register info:', formData);
-      
+      setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:3001/operator/wallets', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Response from backend:', data);
+        // 模拟网络延迟
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // 注册成功后可以添加其他逻辑
-        // 例如显示成功消息或自动切换到登录页面
-        alert('Registration successful!');
-        setIsLogin(true);
+        const { username, password, userType } = formData;
+        const users = userType === USER_TYPES.STUDENT ? mockUsers.students : mockUsers.teachers;
+        const user = users.find(u => u.id === username && u.password === password);
+        
+        if (user) {
+          console.log('Login successful:', username);
+          localStorage.setItem('user', JSON.stringify({
+            id: username,
+            type: userType
+          }));
+          onLogin(userType);
+          navigate(DEFAULT_ROUTES[userType]);
+        } else {
+          setError('Invalid username or password');
+        }
       } catch (error) {
-        console.error('Error during registration:', error);
-        alert('Registration failed: ' + error.message);
+        setError('Login failed. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
+    } else {
+      // 注册逻辑
     }
   };
 
@@ -68,6 +75,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-box">
         <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <select
@@ -85,7 +93,7 @@ const Login = ({ onLogin }) => {
             <input
               type="text"
               name="username"
-              placeholder="student id"
+              placeholder={formData.userType === USER_TYPES.STUDENT ? "Student ID" : "Teacher ID"}
               value={formData.username}
               onChange={handleInputChange}
             />
@@ -113,14 +121,19 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
-          <button type="submit" className="submit-btn">
-            {isLogin ? 'Login' : 'Register'}
+          <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`}disabled={isLoading}>
+            {isLoading ? (
+              <div className="loading-spinner">
+                <div className="spinner"></div>
+                <span>Logging in...</span>
+              </div>
+            ) : (isLogin ? 'Login' : 'Register')}
           </button>
         </form>
 
         <p className="switch-form">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <span onClick={() => setIsLogin(!isLogin)}>
+          <span onClick={() => !isLoading && setIsLogin(!isLogin)}>
             {isLogin ? 'Register' : 'Login'}
           </span>
         </p>
