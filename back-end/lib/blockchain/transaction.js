@@ -42,6 +42,7 @@ class Transaction {
         this.data = {
             inputs: [],
             outputs: [],
+            List: [],
             metadata: {
                 category: null,    // 类别
                 studentId: null,   // 学生ID
@@ -51,8 +52,10 @@ class Transaction {
                 timestamp: null,   // 时间戳
                 courseId: null,    // 课程ID 
                 timeRange: null,   // 时间范围
-                publicKey: null,   // 公钥
                 power: null,       // 权限
+                walletId: null,   // 钱包ID
+                publicKey: null,   // 公钥
+                secretKey: null,   // 私钥加密后的
                 hash: null,        // 哈希值
             }
         };
@@ -89,7 +92,11 @@ class Transaction {
         }, this.data.inputs);
 
 
-        if (this.type == 'regular') {
+        if (this.type == 'regular' || 
+            this.type == 'attendance' || 
+            this.type == 'register' || 
+            this.type == 'course' || 
+            this.type == 'Ids') {
             // Check if the sum of input transactions are greater than output transactions, it needs to leave some room for the transaction fee
             let sumOfInputsAmount = R.sum(R.map(R.prop('amount'), this.data.inputs));
             let sumOfOutputsAmount = R.sum(R.map(R.prop('amount'), this.data.outputs));

@@ -61,6 +61,12 @@ class Miner {
         const transactionsInBlocks = R.flatten(R.map(R.prop('transactions'), blocks));
         const inputTransactionsInTransaction = R.compose(R.flatten, R.map(R.compose(R.prop('inputs'), R.prop('data'))));
 
+        // console.log('待处理交易:', candidateTransactions.map(tx => ({
+        //     id: tx.id,
+        //     type: tx.type,
+        //     metadata: tx.metadata
+        // })));
+
         // Select transactions that can be mined         
         let rejectedTransactions = [];
         let selectedTransactions = [];
@@ -93,7 +99,18 @@ class Miner {
             }, transaction.data.inputs);
 
             if (R.all(R.equals(false), transactionInputFoundAnywhere)) {
-                if (transaction.type === 'regular' && negativeOutputsFound === 0) {
+                // 检查是否为合法的交易类型
+                if ((transaction.type === 'regular' || 
+                     transaction.type === 'register' || 
+                     transaction.type === 'course' || 
+                     transaction.type === 'attendance' || 
+                     transaction.type === 'Ids'||
+                     transaction.type === 'lesson' ||
+                     transaction.type === 'regular' ||
+                     transaction.type === 'reward' ||
+                     transaction.type === 'fee'
+                    ) &&     
+                    negativeOutputsFound === 0) {
                     selectedTransactions.push(transaction);
                 } else if (transaction.type === 'reward') {
                     selectedTransactions.push(transaction);
@@ -106,6 +123,12 @@ class Miner {
         }, candidateTransactions);
 
         console.info(`Selected ${selectedTransactions.length} candidate transactions with ${rejectedTransactions.length} being rejected.`);
+
+        // console.log('已选择交易:', selectedTransactions.map(tx => ({
+        //     id: tx.id,
+        //     type: tx.type,
+        //     metadata: tx.metadata
+        // })));
 
         // Get the first two avaliable transactions, if there aren't TRANSACTIONS_PER_BLOCK, it's empty
         let transactions = R.defaultTo([], R.take(Config.TRANSACTIONS_PER_BLOCK, selectedTransactions));

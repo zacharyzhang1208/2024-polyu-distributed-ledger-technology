@@ -34,6 +34,15 @@ class CryptoEdDSAUtil {
     static toHex(data) {
         return elliptic.utils.toHex(data);
     }
+
+    static signMessage(secretKey, message) {
+        // 从私钥创建密钥对
+        let keyPair = ec.keyFromSecret(secretKey);
+        // 使用密钥对签名消息
+        let signature = keyPair.sign(message).toHex().toLowerCase();
+        console.debug(`Signature: \n${signature}`);
+        return signature;
+    }
 }
 
 module.exports = CryptoEdDSAUtil;

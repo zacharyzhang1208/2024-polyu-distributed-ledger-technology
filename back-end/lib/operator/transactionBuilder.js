@@ -49,10 +49,16 @@ class TransactionBuilder {
 
     ////////////////////////////////
     setMetadata(metadata) {
+        console.log('设置交易元数据:', metadata);
         this.metadata = metadata;
         return this;
     }
     ////////////////////////////////
+
+    setList(list) {
+        this.list = list;
+        return this;
+    }
 
     build() {
         // Check required information

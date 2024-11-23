@@ -8,6 +8,7 @@ const TransactionAssertionError = require('./transactionAssertionError');
 const BlockAssertionError = require('./blockAssertionError');
 const BlockchainAssertionError = require('./blockchainAssertionError');
 const Config = require('../config');
+const CryptoUtil = require('../util/cryptoUtil');
 
 // Database settings
 const BLOCKCHAIN_FILE = 'blocks.json';
@@ -62,7 +63,19 @@ class Blockchain {
     }
 
     getAllTransactions() {
-        return this.transactions;
+        // 获取所有区块中的交易
+        const confirmedTransactions = R.flatten(
+            this.blocks.map(block => block.transactions)
+        );
+        
+        // 合并未确认的交易池中的交易
+        const allTransactions = [...confirmedTransactions, ...this.transactions];
+        
+        console.log('区块中的交易数量:', confirmedTransactions.length);
+        console.log('未确认交易数量:', this.transactions.length);
+        console.log('总交易数量:', allTransactions.length);
+        
+        return allTransactions;
     }
 
     getTransactionById(id) {
@@ -117,8 +130,10 @@ class Blockchain {
     addBlock(newBlock, emit = true) {
         // It only adds the block if it's valid (we need to compare to the previous one)
         if (this.checkBlock(newBlock, this.getLastBlock())) {
+            console.log('添加区块前:', this.blocks);
             this.blocks.push(newBlock);
             this.blocksDb.write(this.blocks);
+            console.log('添加区块后:', this.blocks);
 
             // After adding the block it removes the transactions of this block from the list of pending transactions
             this.removeBlockTransactionsFromTransactions(newBlock);
@@ -146,7 +161,14 @@ class Blockchain {
     }
 
     removeBlockTransactionsFromTransactions(newBlock) {
-        this.transactions = R.reject((transaction) => { return R.find(R.propEq('id', transaction.id), newBlock.transactions); }, this.transactions);
+        console.log('移除前的交易池:', this.transactions);
+        console.log('要移除的区块交易:', newBlock.transactions);
+        
+        this.transactions = R.reject((transaction) => {
+            return R.find(R.propEq('id', transaction.id), newBlock.transactions);
+        }, this.transactions);
+        
+        console.log('移除后的交易池:', this.transactions);
         this.transactionsDb.write(this.transactions);
     }
 
@@ -286,6 +308,54 @@ class Blockchain {
         }, txOutputs);
 
         return unspentTransactionOutput;
+    }
+
+    mine(rewardAddress) {
+        let newBlock = null;
+        try {
+            console.log('开始挖矿，当前交易池:', this.transactions);
+            
+            // 获取未确认的交易
+            const transactions = this.transactions.transactions;
+            
+            if (transactions.length === 0) {
+                console.log('No transactions to mine');
+                return null;
+            }
+
+            // 获取最后一个区块
+            const previousBlock = R.last(this.blocks.blocks);
+            
+            // 创建新区块
+            newBlock = {
+                index: previousBlock.index + 1,
+                previousHash: previousBlock.hash,
+                timestamp: new Date().getTime(),
+                transactions: transactions,
+                nonce: 0
+            };
+
+            // 计算新区块的哈希值
+            newBlock.hash = CryptoUtil.hash(JSON.stringify(newBlock));
+
+            // 添加区块到区块链
+            this.blocks.push(newBlock);
+            this.blocks.write();
+
+            // 清空交易池
+            this.transactions.clear();
+            this.transactions.write();
+
+            console.log(`Block #${newBlock.index} mined with hash: ${newBlock.hash}`);
+            
+            console.log('挖矿完成，新区块:', newBlock);
+            console.log('区块链状态:', this.blocks);
+            
+            return newBlock;
+        } catch (error) {
+            console.error('挖矿错误:', error);
+            throw error;
+        }
     }
 }
 
