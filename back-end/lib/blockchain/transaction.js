@@ -94,8 +94,11 @@ class Transaction {
 
         if (this.type == 'regular' || 
             this.type == 'attendance' || 
-            this.type == 'register' || 
+            this.type == 'enroll' ||
+            this.type == 'lesson' ||
             this.type == 'course' || 
+            this.type == 'register' || 
+            
             this.type == 'Ids') {
             // Check if the sum of input transactions are greater than output transactions, it needs to leave some room for the transaction fee
             let sumOfInputsAmount = R.sum(R.map(R.prop('amount'), this.data.inputs));

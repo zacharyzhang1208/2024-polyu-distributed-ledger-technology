@@ -681,6 +681,81 @@ class HttpServer {
             }
         });
 
+        // 查询学生选课列表
+        this.app.get('/query/studentEnrolledCourses', (req, res) => {
+            try {
+                const { studentId } = req.query;
+                
+                // 参数验证
+                if (!studentId) {
+                    throw new Error('studentId is required');
+                }
+
+                // 调用 operator 中的方法获取选课列表
+                const enrolledCourses = operator.getStudentEnrolledCourses(studentId);
+                
+                res.status(200).send({
+                    success: true,
+                    total: enrolledCourses.total,
+                    courses: enrolledCourses.courses,
+                    message: `找到 ${enrolledCourses.total} 门已选课程`
+                });
+            } catch (ex) {
+                throw new HTTPError(400, ex.message);
+            }
+        });
+
+        // 查询课程选课学生列表
+        this.app.get('/query/courseEnrolledStudents', (req, res) => {
+            try {
+                const { courseId } = req.query;
+                
+                // 参数验证
+                if (!courseId) {
+                    throw new Error('courseId is required');
+                }
+
+                // 调用 operator 中的方法获取选课学生列表
+                const enrolledStudents = operator.getCourseEnrolledStudents(courseId);
+                
+                res.status(200).send({
+                    success: true,
+                    total: enrolledStudents.total,
+                    students: enrolledStudents.students,
+                    message: `找到 ${enrolledStudents.total} 名选课学生`
+                });
+            } catch (ex) {
+                throw new HTTPError(400, ex.message);
+            }
+        });
+
+        // 查询课程历史验证码
+        this.app.get('/query/courseLessonHistory', (req, res) => {
+            try {
+                const { courseId } = req.query;
+                
+                // 参数验证
+                if (!courseId) {
+                    throw new Error('courseId is required');
+                }
+
+                // 调用 operator 中的方法获取课程历史记录
+                const lessonHistory = operator.getCourseLessonHistory(courseId);
+                
+                res.status(200).send({
+                    success: true,
+                    total: lessonHistory.total,
+                    lessons: lessonHistory.lessons.map(lesson => ({
+                        ...lesson,
+                        timestamp: new Date(lesson.timestamp).toLocaleString(), // 格式化时间戳
+                    })),
+                    message: `找到 ${lessonHistory.total} 条课程记录`
+                });
+            } catch (ex) {
+                throw new HTTPError(400, ex.message);
+            }
+        });
+
         this.app.use(function (err, req, res, next) {  // eslint-disable-line no-unused-vars
             if (err instanceof HTTPError) res.status(err.status);
             else res.status(500);

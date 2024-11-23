@@ -52,4 +52,12 @@ export const checkTeacherRegistration = async (teacherId) => {
 
 export const getTeacherCourses = async (teacherId) => {
     return createApiRequest(`${config.endpoints.teacherCourses}?teacherId=${teacherId}`);
+};
+
+export const getStudentEnrolledCourses = async (studentId) => {
+    return createApiRequest(`${config.endpoints.studentEnrolledCourses}?studentId=${studentId}`);
+};
+
+export const getCourseEnrolledStudents = async (courseId) => {
+    return createApiRequest(`${config.endpoints.courseEnrolledStudents}?courseId=${courseId}`);
 }; 

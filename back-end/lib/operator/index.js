@@ -132,7 +132,7 @@ class Operator {
         return Transaction.fromJson(tx.build());
     }
 
-    // 学生注册交易，注册后实现将学生ID和公钥上传到区块链
+    // ���生注册交易，注册后实现将学生ID和公钥上传到区块链
     //水龙头会自动给学生50元
     createStudentRegisterTransaction(walletId, fromAddressId, toAddressId, studentId, publicKey,
                                 encryptedSecretKey,power=0,amount=0) {
@@ -528,10 +528,11 @@ class Operator {
 
             // 构建metadata内容
             let metadataContent = {
-                category: 'enrolled',
+                category: 'enroll',
                 studentId: studentId,
                 teacherId: teacherId,
                 courseId: courseId,
+                publicKey: coursePublicKey,
                 timestamp: new Date().getTime()
             };
 
@@ -554,7 +555,7 @@ class Operator {
             tx.to(coursePublicKey, 1);  // 转账1个代币到课程地址
             tx.change(studentPublicKey); // 找零地址设为学生地址
             tx.fee(Config.FEE_PER_TRANSACTION);
-            tx.setType('enrolled');      // 设置交易类型
+            tx.setType('enroll');      // 设置交易类型
             tx.sign(studentSecretKey);   // 使用学生私钥签名交易
             tx.setMetadata(metadata);    // 设置metadata
 
@@ -563,6 +564,108 @@ class Operator {
             console.error('创建课程登记交易失败:', error);
             throw error;
         }
+    }
+
+    // 查询学生选课列表
+    getStudentEnrolledCourses(studentId) {
+        if (!studentId) {
+            throw new ArgumentError('studentId is required');
+        }
+
+        let allTransactions = this.blockchain.getAllTransactions();
+        
+        // 查找所有该学生的选课记录
+        const enrolledCourses = allTransactions
+            .filter(transaction => {
+                const metadata = transaction.data?.metadata;
+                return transaction.type === 'enroll' && 
+                       metadata?.category === 'enroll' && 
+                       metadata?.studentId === studentId;
+            })
+            .map(transaction => {
+                const metadata = transaction.data.metadata;
+                return {
+                    courseId: metadata.courseId,
+                    publicKey: metadata.publicKey,
+                    timestamp: metadata.timestamp
+                };
+            });
+
+        // 按时间排序，最新的在前
+        enrolledCourses.sort((a, b) => b.timestamp - a.timestamp);
+
+        return {
+            total: enrolledCourses.length,
+            courses: enrolledCourses
+        };
+    }
+
+    // 查询课程的选课学生列表
+    getCourseEnrolledStudents(courseId) {
+        if (!courseId) {
+            throw new ArgumentError('courseId is required');
+        }
+
+        let allTransactions = this.blockchain.getAllTransactions();
+        
+        // 查找所有选择该课程的学生记录
+        const enrolledStudents = allTransactions
+            .filter(transaction => {
+                const metadata = transaction.data?.metadata;
+                return transaction.type === 'enroll' && 
+                       metadata?.category === 'enroll' && 
+                       metadata?.courseId === courseId;
+            })
+            .map(transaction => {
+                const metadata = transaction.data.metadata;
+                return {
+                    studentId: metadata.studentId,
+                    timestamp: metadata.timestamp
+                };
+            });
+
+        // 按时间排序，最新的在前
+        enrolledStudents.sort((a, b) => b.timestamp - a.timestamp);
+
+        return {
+            total: enrolledStudents.length,
+            students: enrolledStudents
+        };
+    }
+
+    // 获取课程历史验证码
+    getCourseLessonHistory(courseId) {
+        if (!courseId) {
+            throw new ArgumentError('courseId is required');
+        }
+
+        let allTransactions = this.blockchain.getAllTransactions();
+        
+        // 查找所有该课程的发布记录
+        const lessonHistory = allTransactions
+            .filter(transaction => {
+                const metadata = transaction.data?.metadata;
+                return transaction.type === 'lesson' && 
+                       metadata?.category === 'lesson' && 
+                       metadata?.courseId === courseId;
+            })
+            .map(transaction => {
+                const metadata = transaction.data.metadata;
+                return {
+                    courseId: metadata.courseId,
+                    teacherId: metadata.teacherId,
+                    verifyCode: metadata.verifyCode,
+                    timestamp: metadata.timestamp
+                };
+            });
+
+        // 按时间排序，最新的在前
+        lessonHistory.sort((a, b) => b.timestamp - a.timestamp);
+
+        return {
+            total: lessonHistory.length,
+            lessons: lessonHistory
+        };
     }
 
 }
