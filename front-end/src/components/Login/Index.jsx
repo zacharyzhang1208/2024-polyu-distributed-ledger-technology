@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { USER_TYPES, DEFAULT_ROUTES } from '../../constants/userTypes';
+import { checkStudentRegistration, checkTeacherRegistration, registerStudent, registerTeacher } from '../../services/api';
 import '../../css/Login.css';
 
 const Login = ({ onLogin }) => {
@@ -21,60 +22,81 @@ const Login = ({ onLogin }) => {
       ...formData,
       [name]: value
     });
-    // 清除错误信息
     setError('');
-  };
-
-  // 模拟的用户数据
-  const mockUsers = {
-    students: [
-      { id: '2024001', password: '123456' },
-      { id: '2024002', password: '123456' }
-    ],
-    teachers: [
-      { id: 'teacher001', password: '123456' },
-      { id: 'teacher002', password: '123456' }
-    ]
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (isLogin) {
-      setIsLoading(true);
-      try {
-        // 模拟网络延迟
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const { username, password, userType } = formData;
-        const users = userType === USER_TYPES.STUDENT ? mockUsers.students : mockUsers.teachers;
-        const user = users.find(u => u.id === username && u.password === password);
-        
-        if (user) {
-          console.log('Login successful:', username);
-          localStorage.setItem('user', JSON.stringify({
-            id: username,
-            type: userType
-          }));
-          onLogin(userType);
-          navigate(DEFAULT_ROUTES[userType]);
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { username, password, userType } = formData;
+
+      if (isLogin) {
+        // 登录逻辑
+        if (userType === USER_TYPES.STUDENT) {
+          const { exists, message } = await checkStudentRegistration(username);
+          if (!exists) {
+            setError(message || '该学生尚未注册，请先注册');
+            setIsLoading(false);
+            return;
+          }
         } else {
-          setError('Invalid username or password');
+          const { exists, message } = await checkTeacherRegistration(username);
+          if (!exists) {
+            setError(message || '该教师尚未注册，请先注册');
+            setIsLoading(false);
+            return;
+          }
         }
-      } catch (error) {
-        setError('Login failed. Please try again.');
-      } finally {
-        setIsLoading(false);
+        
+        // TODO: 实现登录验证
+        localStorage.setItem('user', JSON.stringify({
+          id: username,
+          type: userType
+        }));
+        onLogin(userType);
+        navigate(DEFAULT_ROUTES[userType]);
+      } else {
+        // 注册逻辑
+        if (userType === USER_TYPES.STUDENT) {
+          const { exists, message } = await checkStudentRegistration(username);
+          if (exists) {
+            setError(message || '该学生已注册');
+            setIsLoading(false);
+            return;
+          }
+          await registerStudent(formData);
+        } else {
+          const { exists, allowed, message } = await checkTeacherRegistration(username);
+          if (exists) {
+            setError(message || '该教师已注册');
+            setIsLoading(false);
+            return;
+          }
+          if (!allowed) {
+            setError(message || '该教师ID不在允许注册列表中');
+            setIsLoading(false);
+            return;
+          }
+          await registerTeacher(formData);
+        }
+        
+        setError('注册成功！请登录');
+        setIsLogin(true);
       }
-    } else {
-      // 注册逻辑
+    } catch (error) {
+      setError(error.message || (isLogin ? '登录失败' : '注册失败'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        <h2>{isLogin ? '登录' : '注册'}</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -84,8 +106,8 @@ const Login = ({ onLogin }) => {
               onChange={handleInputChange}
               className="user-type-select"
             >
-              <option value={USER_TYPES.STUDENT}>Student</option>
-              <option value={USER_TYPES.TEACHER}>Teacher</option>
+              <option value={USER_TYPES.STUDENT}>学生</option>
+              <option value={USER_TYPES.TEACHER}>教师</option>
             </select>
           </div>
 
@@ -93,7 +115,7 @@ const Login = ({ onLogin }) => {
             <input
               type="text"
               name="username"
-              placeholder={formData.userType === USER_TYPES.STUDENT ? "Student ID" : "Teacher ID"}
+              placeholder={formData.userType === USER_TYPES.STUDENT ? "学号" : "教师工号"}
               value={formData.username}
               onChange={handleInputChange}
             />
@@ -104,7 +126,7 @@ const Login = ({ onLogin }) => {
               <input
                 type="email"
                 name="email"
-                placeholder="e-mail"
+                placeholder="邮箱"
                 value={formData.email}
                 onChange={handleInputChange}
               />
@@ -115,26 +137,26 @@ const Login = ({ onLogin }) => {
             <input
               type="password"
               name="password"
-              placeholder="password"
+              placeholder="密码"
               value={formData.password}
               onChange={handleInputChange}
             />
           </div>
 
-          <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`}disabled={isLoading}>
+          <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`} disabled={isLoading}>
             {isLoading ? (
               <div className="loading-spinner">
                 <div className="spinner"></div>
-                <span>Logging in...</span>
+                <span>{isLogin ? '登录中...' : '注册中...'}</span>
               </div>
-            ) : (isLogin ? 'Login' : 'Register')}
+            ) : (isLogin ? '登录' : '注册')}
           </button>
         </form>
 
         <p className="switch-form">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          {isLogin ? "还没有账号?" : "已有账号?"}
           <span onClick={() => !isLoading && setIsLogin(!isLogin)}>
-            {isLogin ? 'Register' : 'Login'}
+            {isLogin ? '注册' : '登录'}
           </span>
         </p>
       </div>

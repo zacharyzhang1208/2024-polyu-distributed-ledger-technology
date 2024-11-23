@@ -62,6 +62,10 @@ class Blockchain {
         return Config.pow.getDifficulty(this.blocks, index);        
     }
 
+    getAllUnconfirmedTransactions() {
+        return this.transactions;
+    }
+
     getAllTransactions() {
         // 获取所有区块中的交易
         const confirmedTransactions = R.flatten(
@@ -161,14 +165,14 @@ class Blockchain {
     }
 
     removeBlockTransactionsFromTransactions(newBlock) {
-        console.log('移除前的交易池:', this.transactions);
-        console.log('要移除的区块交易:', newBlock.transactions);
+        // console.log('移除前的交易池:', this.transactions);
+        // console.log('要移除的区块交易:', newBlock.transactions);
         
         this.transactions = R.reject((transaction) => {
             return R.find(R.propEq('id', transaction.id), newBlock.transactions);
         }, this.transactions);
         
-        console.log('移除后的交易池:', this.transactions);
+        // console.log('移除后的交易池:', this.transactions);
         this.transactionsDb.write(this.transactions);
     }
 

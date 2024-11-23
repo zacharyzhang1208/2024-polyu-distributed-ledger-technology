@@ -20,8 +20,15 @@ const SymmetricCrypto = require('../util/symmetricCrypto');
 class HttpServer {
     constructor(node, blockchain, operator, miner) {
         this.app = express();
-        this.app.use(cors()); //处理CORS问题
-
+        
+        // 配置 CORS
+        const corsOptions = {
+            origin: 'http://localhost:8080', // webpack-dev-server 默认端口
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        };
+        this.app.use(cors(corsOptions));
         this.app.use(bodyParser.json());
         this.app.set('view engine', 'pug');
         this.app.set('views', path.join(__dirname, 'views'));
@@ -92,10 +99,10 @@ class HttpServer {
             if (req.headers['accept'] && req.headers['accept'].includes('text/html'))
                 res.render('blockchain/transactions/index.pug', {
                     pageTitle: 'Unconfirmed Transactions',
-                    transactions: blockchain.getAllTransactions()
+                    transactions: blockchain.getAllUnconfirmedTransactions()
                 });
             else
-                res.status(200).send(blockchain.getAllTransactions());
+                res.status(200).send(blockchain.getAllUnconfirmedTransactions());
         });
 
         this.app.post('/blockchain/transactions', (req, res) => {
@@ -293,7 +300,7 @@ class HttpServer {
         });
 
         // 注册Course,输入教师ID和课程ID，返回公钥和私钥
-        // 这时候后教师ID已经注册过有了唯一的钱包ID，是在这钱包ID下注册课程地址
+        // 这时候后教师ID已经注册过有了唯一的钱包ID，是在这钱包ID下注册程地址
         
         this.app.post('/operator/courseRegister', (req, res) => {
             let teacherId = req.body.teacherId;
@@ -321,7 +328,7 @@ class HttpServer {
         });
 
         // Lesson发布交易
-        //
+
         this.app.post('/operator/lessonPublish', (req, res) => {
             let teacherId = req.body.teacherId;
             let courseId = req.body.courseId;
@@ -373,6 +380,66 @@ class HttpServer {
                 }
             }
         }); 
+        //学生加入课程
+        // 在 httpServer/index.js 中添加路由
+        this.app.post('/operator/enrollCourse', (req, res) => {
+            try {
+                const { 
+                    studentId,
+                    password, 
+                    teacherId, 
+                    courseId 
+                } = req.body;
+
+                // 参数验证
+                if (!studentId || !password || !teacherId || !courseId) {
+                    throw new Error('Missing required parameters');
+                }
+
+                // 1. 获取学生的公钥和加密的私钥
+                const studentKeys = operator.getStudentKeys(studentId);
+                if (!studentKeys) {
+                    throw new HTTPError(404, `Student not found with ID: ${studentId}`);
+                }
+
+                // 2. 使用密码解密私钥
+                const studentSecretKey = SymmetricCrypto.decrypt(studentKeys.encryptedSecretKey, password);
+                if (!studentSecretKey) {
+                    throw new HTTPError(401, 'Invalid password');
+                }
+
+                // 3. 获取课程的公钥
+                const coursePublicKey = operator.getCoursePublicKey(courseId);
+                if (!coursePublicKey) {
+                    throw new HTTPError(404, `Course not found with ID: ${courseId}`);
+                }
+
+                // 4. 创建登记交易
+                const transaction = operator.createEnrollTransaction(
+                    studentKeys.publicKey,    // 学生公钥
+                    studentSecretKey,         // 解密后的学生私钥
+                    coursePublicKey,          // 课程公钥
+                    studentId,                // 学生ID
+                    teacherId,                // 教师ID
+                    courseId                  // 课程ID
+                );
+
+                // 5. 添加到区块链
+                const transactionCreated = blockchain.addTransaction(transaction);
+                
+                res.status(201).send({
+                    message: '课程登记成功',
+                    transaction: transactionCreated
+                });
+
+            } catch (ex) {
+                if (ex instanceof HTTPError) {
+                    throw ex;
+                } else {
+                    throw new HTTPError(400, ex.message);
+                }
+            }
+        });
 
 
         this.app.get('/operator/wallets/:walletId/addresses', (req, res) => {
@@ -445,7 +512,7 @@ class HttpServer {
                 });
         });
         ////////////////// 查询考勤记录
-        this.app.get('/blockchain/attendance', (req, res) => {
+        this.app.get('/query/attendance', (req, res) => {
             try {
                 // 从查询参数中获取数据
                 const { studentId, courseId, startDate, endDate } = req.query;
@@ -524,7 +591,7 @@ class HttpServer {
             }
         });
         ////////////////// 查询学生是否注册
-        this.app.get('/blockchain/check-student', (req, res) => {
+        this.app.get('/query/checkStudent', (req, res) => {
             try {
                 const { studentId } = req.query;
                 
@@ -535,15 +602,78 @@ class HttpServer {
 
                 let allTransactions = blockchain.getAllTransactions();
                 
-                // 检查是否存在任何交易的 studentList 包含该学生
+                // 检查是否存在学生注册交易
                 const isStudentExists = allTransactions.some(transaction => {
-                    // 确保 transaction 有 studentList 属性且是数组
-                    return Array.isArray(transaction.studentList) && 
-                           transaction.studentList.includes(studentId);
+                    // 检查交易类型是否为学生注册，并且studentId匹配
+                    return transaction.type === 'register' && 
+                           transaction.data && 
+                           transaction.data.metadata && 
+                           transaction.data.metadata.studentId === studentId;
                 });
 
                 res.status(200).send({
-                    exists: isStudentExists
+                    exists: isStudentExists,
+                    message: isStudentExists ? '该学生已注册' : '该学生未注册'
+                });
+                
+            } catch (ex) {
+                throw new HTTPError(400, ex.message);
+            }
+        });
+
+        // 查询教师是否可以注册
+        this.app.get('/query/checkTeacher', (req, res) => {
+            try {
+                const { teacherId } = req.query;
+                
+                // 参数验证
+                if (!teacherId) {
+                    throw new Error('teacherId 是必需的参数');
+                }
+
+                // 检查教师ID是否在允许列表中
+                const isTeacherAllowed = operator.checkIdInList(teacherId);
+                
+                // 检查是否已经注册
+                let allTransactions = blockchain.getAllTransactions();
+                const isTeacherExists = allTransactions.some(transaction => {
+                    return transaction.type === 'register' && 
+                           transaction.data && 
+                           transaction.data.metadata && 
+                           transaction.data.metadata.teacherId === teacherId;
+                });
+
+                res.status(200).send({
+                    exists: isTeacherExists,
+                    allowed: isTeacherAllowed,
+                    message: isTeacherExists ? '该教师已注册' : 
+                            !isTeacherAllowed ? '该教师ID不在允许注册列表中' : 
+                            '该教师可以注册'
+                });
+                
+            } catch (ex) {
+                throw new HTTPError(400, ex.message);
+            }
+        });
+
+        // 查询教师注册的课程
+        this.app.get('/query/teacherCourses', (req, res) => {
+            try {
+                const { teacherId } = req.query;
+                
+                // 参数验证
+                if (!teacherId) {
+                    throw new Error('teacherId 是必需的参数');
+                }
+
+               
+                
+                // 查找所有该教师注册的课程
+                let teacherCourses = operator.getTeacherCourses(teacherId);
+
+                res.status(200).send({
+                    total: teacherCourses.length,
+                    courses: teacherCourses
                 });
                 
             } catch (ex) {
@@ -561,37 +691,7 @@ class HttpServer {
         // this.initializeIds(operator, blockchain, miner);
     }
 
-    // // 添加新方法处理初始化逻辑
-    // async initializeIds(operator, blockchain, miner) {
-    //     try {
-    //         // 检查是否已经初始化过（例如检查第一个区块之后是否有包含 Ids 类型的交易）
-    //         const allTransactions = blockchain.getAllTransactions();
-    //         const hasIdsTransaction = allTransactions.some(tx => tx.type === 'Ids');
-            
-    //         if (!hasIdsTransaction) {
-    //             console.info('Initializing IDs transaction...');
-                
-    //             // 创建ID交易
-    //             const idsTransaction = operator.createIdsTransaction();
-                
-    //             // 添加交易到区块链
-    //             blockchain.addTransaction(idsTransaction);
-                
-    //             // 使用水龙头地址进行挖矿
-    //             const faucetAddress = Config.FAUCET_ADDRESS;
-                
-    //             // 挖矿并添加新区块
-    //             const newBlock = await miner.mine(faucetAddress, faucetAddress);
-    //             blockchain.addBlock(Block.fromJson(newBlock));
-                
-    //             console.info('IDs initialization completed successfully');
-    //         } else {
-    //             console.info('IDs already initialized, skipping...');
-    //         }
-    //     } catch (error) {
-    //         console.error('Failed to initialize IDs:', error);
-    //     }
-    // }
+    
 
     listen(host, port) {
         return new Promise((resolve, reject) => {

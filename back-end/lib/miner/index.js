@@ -106,6 +106,7 @@ class Miner {
                      transaction.type === 'attendance' || 
                      transaction.type === 'Ids'||
                      transaction.type === 'lesson' ||
+                     transaction.type === 'enroll' ||
                      transaction.type === 'regular' ||
                      transaction.type === 'reward' ||
                      transaction.type === 'fee'

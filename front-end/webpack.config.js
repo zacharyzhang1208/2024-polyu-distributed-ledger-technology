@@ -38,7 +38,13 @@ module.exports = {
     port: 8080,
     hot: true,
     open: true,
-    historyApiFallback: true
+    historyApiFallback: true,
+    proxy: [{
+      context: ['/query', '/operator'],
+      target: 'http://localhost:3001',
+      changeOrigin: true,
+      secure: false
+    }]
   },
   plugins: [
     new HtmlWebpackPlugin({

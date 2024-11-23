@@ -132,7 +132,7 @@ class Operator {
         return Transaction.fromJson(tx.build());
     }
 
-    // 生注册交易，注册后实现将学生ID和公钥上传到区块链
+    // 学生注册交易，注册后实现将学生ID和公钥上传到区块链
     //水龙头会自动给学生50元
     createStudentRegisterTransaction(walletId, fromAddressId, toAddressId, studentId, publicKey,
                                 encryptedSecretKey,power=0,amount=0) {
@@ -327,7 +327,7 @@ class Operator {
         let secretKey = wallet.getSecretKeyByAddress(address);
         
         // 加密私钥 - 使用新的加密方法
-        const encryptedSecretKey = CryptoUtil.encrypt(secretKey, password);
+        const encryptedSecretKey = SymmetricCrypto.encrypt(secretKey, password);
         
         return {
             walletId: wallet.id,
@@ -442,7 +442,7 @@ class Operator {
         if (!studentId) {
             throw new ArgumentError('studentId is required');
         }
-
+        // 获取所有交易
         let allTransactions = this.blockchain.getAllTransactions();
         
         // 找到学生注册交易
@@ -484,6 +484,85 @@ class Operator {
         }
 
         return courseTransaction.data.metadata.publicKey;
+    }
+    //通过教师id查询教师注册的课程
+    getTeacherCourses(teacherId) {
+        if (!teacherId) {
+            throw new ArgumentError('teacherId is required');
+        }
+        let allTransactions = blockchain.getAllTransactions();
+                
+        // 查找所有该教师注册的课程
+        const teacherCourses = allTransactions
+            .filter(transaction => {
+                return transaction.type === 'course' && 
+                        transaction.data && 
+                        transaction.data.metadata && 
+                        transaction.data.metadata.teacherId === teacherId;
+            })
+            .map(transaction => {
+                const metadata = transaction.data.metadata;
+                return {
+                    courseId: metadata.courseId,
+                    teacherId: metadata.teacherId,
+                    publicKey: metadata.publicKey,
+                    timestamp: transaction.timestamp
+                };
+            });
+
+        // 按时间排序，最新的在前
+        teacherCourses.sort((a, b) => b.timestamp - a.timestamp);
+
+        return teacherCourses;
+    }
+
+    // 添加课程登记交易
+    createEnrollTransaction(studentPublicKey, studentSecretKey, coursePublicKey, studentId, teacherId, courseId) {
+        try {
+            // 获取学生账户的UTXO
+            let utxo = this.blockchain.getUnspentTransactionsForAddress(studentPublicKey);
+            
+            if (!utxo || utxo.length === 0) {
+                throw new ArgumentError(`No unspent transactions found for student address: ${studentPublicKey}`);
+            }
+
+            // 构建metadata内容
+            let metadataContent = {
+                category: 'enrolled',
+                studentId: studentId,
+                teacherId: teacherId,
+                courseId: courseId,
+                timestamp: new Date().getTime()
+            };
+
+            // 使用 CryptoUtil 对metadata进行哈希
+            const metadataString = JSON.stringify(metadataContent);
+            const metadataHash = CryptoUtil.hash(metadataString);
+            
+            // 使用学生私钥对metadata哈希进行签名
+            const signature = CryptoEdDSAUtil.signMessage(studentSecretKey, metadataHash);
+
+            // 将签名添加到metadata中
+            let metadata = {
+                ...metadataContent,
+                hash: signature  // 添加签名作为hash
+            };
+
+            // 构建交易
+            let tx = new TransactionBuilder();
+            tx.from(utxo);
+            tx.to(coursePublicKey, 1);  // 转账1个代币到课程地址
+            tx.change(studentPublicKey); // 找零地址设为学生地址
+            tx.fee(Config.FEE_PER_TRANSACTION);
+            tx.setType('enrolled');      // 设置交易类型
+            tx.sign(studentSecretKey);   // 使用学生私钥签名交易
+            tx.setMetadata(metadata);    // 设置metadata
+
+            return Transaction.fromJson(tx.build());
+        } catch (error) {
+            console.error('创建课程登记交易失败:', error);
+            throw error;
+        }
     }
 
 }
