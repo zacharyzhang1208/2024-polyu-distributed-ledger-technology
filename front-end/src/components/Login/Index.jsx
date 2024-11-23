@@ -12,6 +12,7 @@ const Login = ({ onLogin }) => {
     email: '',
     userType: USER_TYPES.STUDENT
   });
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,48 +20,58 @@ const Login = ({ onLogin }) => {
       ...formData,
       [name]: value
     });
+    // 清除错误信息
+    setError('');
+  };
+
+  // 模拟的用户数据
+  const mockUsers = {
+    students: [
+      { id: '2024001', password: '123456' },
+      { id: '2024002', password: '123456' }
+    ],
+    teachers: [
+      { id: 'teacher001', password: '123456' },
+      { id: 'teacher002', password: '123456' }
+    ]
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (isLogin) {
-      // 处理登录逻辑
-      console.log('login info:', formData);
+      // 模拟登录验证
+      const { username, password, userType } = formData;
       
-      // 调用父组件的登录回调
-      onLogin(formData.userType);
+      // 根据用户类型选择验证数据
+      const users = userType === USER_TYPES.STUDENT ? mockUsers.students : mockUsers.teachers;
       
-      // 根据用户类型跳转到对应的首页路由
-      const defaultRoute = DEFAULT_ROUTES[formData.userType];
-      navigate(defaultRoute);
-    } else {
-      // 处理注册逻辑
-      console.log('register info:', formData);
+      // 查找用户
+      const user = users.find(u => u.id === username && u.password === password);
       
-      try {
-        const response = await fetch('http://localhost:3001/operator/wallets', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Response from backend:', data);
+      if (user) {
+        // 登录成功
+        console.log('Login successful:', username);
         
-        // 注册成功后可以添加其他逻辑
-        // 例如显示成功消息或自动切换到登录页面
-        alert('Registration successful!');
-        setIsLogin(true);
-      } catch (error) {
-        console.error('Error during registration:', error);
-        alert('Registration failed: ' + error.message);
+        // 存储用户信息到 localStorage
+        localStorage.setItem('user', JSON.stringify({
+          id: username,
+          type: userType
+        }));
+        
+        // 调用父组件的登录回调
+        onLogin(userType);
+        
+        // 根据用户类型跳转到对应的首页路由
+        const defaultRoute = DEFAULT_ROUTES[userType];
+        navigate(defaultRoute);
+      } else {
+        // 登录失败
+        setError('Invalid username or password');
       }
+    } else {
+      // 注册逻辑保持不变
+      // ... 原有的注册代码 ...
     }
   };
 
@@ -68,6 +79,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-box">
         <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <select
@@ -85,7 +97,7 @@ const Login = ({ onLogin }) => {
             <input
               type="text"
               name="username"
-              placeholder="student id"
+              placeholder={formData.userType === USER_TYPES.STUDENT ? "Student ID" : "Teacher ID"}
               value={formData.username}
               onChange={handleInputChange}
             />
