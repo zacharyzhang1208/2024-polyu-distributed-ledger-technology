@@ -18,15 +18,29 @@ const Login = ({ onLogin }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'username' && formData.userType === USER_TYPES.TEACHER) {
+      if (value && !value.endsWith('t')) {
+        setError('Please enter a valid teacher ID (must end with "t")');
+      } else {
+        setError('');
+      }
+    }
+
     setFormData({
       ...formData,
       [name]: value
     });
-    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.userType === USER_TYPES.TEACHER && !formData.username.endsWith('t')) {
+      setError('Please enter a valid teacher ID (must end with "t")');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -115,9 +129,11 @@ const Login = ({ onLogin }) => {
             <input
               type="text"
               name="username"
-              placeholder={formData.userType === USER_TYPES.STUDENT ? "Student ID" : "Teacher ID"}
+              placeholder={formData.userType === USER_TYPES.STUDENT ? "Student ID" : "Teacher ID (end with 't')"}
               value={formData.username}
               onChange={handleInputChange}
+              pattern={formData.userType === USER_TYPES.TEACHER ? ".*t$" : null}
+              title={formData.userType === USER_TYPES.TEACHER ? "Teacher ID must end with 't'" : ""}
             />
           </div>
           
