@@ -16,63 +16,6 @@ import '../../css/Courses.css';
 import Attendance from '../Attendance/Index';
 import EnrolledStudents from '../EnrolledStudents/Index';
 
-// // 示例课程数据，添加更多详细信息
-// const coursesData = [
-//     {
-//         id: 1,
-//         name: 'Computer Science COMP5500',
-//         instructor: 'Dr. Smith',
-//         credits: 3,
-//         semester: 'Fall 2023',
-//         description: 'An introduction to the basic concepts of computer programming and computer science.',
-//         prerequisites: 'None',
-//         schedule: 'Mon/Wed 10:00-11:30',
-//         location: 'Room 101',
-//         capacity: 30,
-//         enrolled: 25
-//     },
-//     {
-//         id: 2,
-//         name: 'Computer Science COMP5501',
-//         instructor: 'Dr. Smith',
-//         credits: 3,
-//         semester: 'Fall 2023',
-//         description: 'An introduction to the basic concepts of computer programming and computer science.',
-//         prerequisites: 'None',
-//         schedule: 'Mon/Wed 10:00-11:30',
-//         location: 'Room 101',
-//         capacity: 30,
-//         enrolled: 25
-//     },
-//     {
-//         id: 4,
-//         name: 'Computer Science COMP5503',
-//         instructor: 'Dr. Smith',
-//         credits: 3,
-//         semester: 'Fall 2023',
-//         description: 'An introduction to the basic concepts of computer programming and computer science.',
-//         prerequisites: 'None',
-//         schedule: 'Mon/Wed 10:00-11:30',
-//         location: 'Room 101',
-//         capacity: 30,
-//         enrolled: 25
-//     },
-//     {
-//         id: 3,
-//         name: 'Computer Science COMP5504',
-//         instructor: 'Dr. Smith',
-//         credits: 3,
-//         semester: 'Fall 2023',
-//         description: 'An introduction to the basic concepts of computer programming and computer science.',
-//         prerequisites: 'None',
-//         schedule: 'Mon/Wed 10:00-11:30',
-//         location: 'Room 101',
-//         capacity: 30,
-//         enrolled: 25
-//     },
-//     // ... 其他课程数据
-// ];
-
 // 生成随机名字的辅助函数
 const generateRandomName = () => {
     const firstNames = ['John', 'Emma', 'Michael', 'Sarah', 'David', 'Lisa', 'James', 'Mary'];
