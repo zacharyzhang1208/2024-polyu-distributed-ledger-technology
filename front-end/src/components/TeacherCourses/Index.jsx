@@ -13,6 +13,7 @@ import '../../css/SearchBar.css';
 import '../../css/CourseCard.css';
 import '../../css/Modal.css';
 import '../../css/Courses.css';
+import Attendance from '../Attendance/Index';
 
 // // 示例课程数据，添加更多详细信息
 // const coursesData = [
@@ -122,7 +123,7 @@ const TeacherCourses = () => {
                     courseId: course.courseId,     // 保存原始课程ID
                     instructor: teacherId,         // 使用教师ID
                     credits: 3,                    // 默认学分
-                    semester: 'Spring 2024',       // 当前学期
+                    semester: 'Spring 2024',       // 当学期
                     description: 'Course description...',
                     prerequisites: 'None',
                     schedule: 'Mon/Wed 10:00-11:30',
@@ -332,170 +333,6 @@ const TeacherCourses = () => {
         setSelectedStudentId('');  // 重置学生ID
     };
 
-    // 修改考勤记录视图的 JSX
-    const renderAttendanceView = () => {
-        switch (attendanceView) {
-            case 'course':
-                return (
-                    <div className="attendance-course-view">
-                        <h3>Course Attendance Overview</h3>
-                        <div className="date-range-picker">
-                            <input
-                                type="date"
-                                value={dateRange.startDate}
-                                onChange={e => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-                            />
-                            <span>to</span>
-                            <input
-                                type="date"
-                                value={dateRange.endDate}
-                                onChange={e => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-                            />
-                            <button onClick={handleAttendanceQuery}>Search</button>
-                        </div>
-                        <table className="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Total Students</th>
-                                    <th>Present Students</th>
-                                    <th>Verify Code</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {attendanceRecords.map((record, index) => {
-                                    // 按日期分组记录
-                                    const date = new Date(record.timestamp).toLocaleDateString();
-                                    // 获取同一天的所有记录
-                                    const sameDayRecords = attendanceRecords.filter(r => 
-                                        new Date(r.timestamp).toLocaleDateString() === date
-                                    );
-                                    // 获取当天出席的学生ID列表
-                                    const presentStudents = [...new Set(sameDayRecords.map(r => r.studentId))];
-
-                                    return (
-                                        <tr key={index}>
-                                            <td>{date}</td>
-                                            <td>{enrolledStudents.length || 0}</td>
-                                            <td>
-                                                {presentStudents.join(', ')}
-                                                <br />
-                                                <span className="attendance-count">
-                                                    (Total: {presentStudents.length})
-                                                </span>
-                                            </td>
-                                            <td>{record.verifyCode}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                );
-
-            case 'student':
-                return (
-                    <div className="attendance-student-view">
-                        <h3>Student Attendance Records</h3>
-                        <div className="student-search">
-                            <input
-                                type="text"
-                                placeholder="Enter Student ID"
-                                value={selectedStudentId}
-                                onChange={e => setSelectedStudentId(e.target.value)}
-                            />
-                            <div className="date-range-picker">
-                                <input
-                                    type="date"
-                                    value={dateRange.startDate}
-                                    onChange={e => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-                                />
-                                <span>to</span>
-                                <input
-                                    type="date"
-                                    value={dateRange.endDate}
-                                    onChange={e => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-                                />
-                            </div>
-                            <button onClick={handleAttendanceQuery}>Search</button>
-                        </div>
-                        <table className="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Check-in Time</th>
-                                    <th>Verify Code</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {attendanceRecords.map((record, index) => (
-                                    <tr key={index}>
-                                        <td>{new Date(record.timestamp).toLocaleDateString()}</td>
-                                        <td>{record.status}</td>
-                                        <td>{record.checkInTime || '-'}</td>
-                                        <td>{record.verifyCode}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                );
-
-            case 'period':
-                return (
-                    <div className="attendance-period-view">
-                        <h3>Period Attendance Statistics</h3>
-                        <div className="date-range-picker">
-                            <input
-                                type="date"
-                                value={dateRange.startDate}
-                                onChange={e => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
-                            />
-                            <span>to</span>
-                            <input
-                                type="date"
-                                value={dateRange.endDate}
-                                onChange={e => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
-                            />
-                            <button onClick={handleAttendanceQuery}>Search</button>
-                        </div>
-                        <div className="attendance-stats">
-                            <div className="stat-item">
-                                <h4>Total Classes</h4>
-                                <span>{attendanceRecords.length}</span>
-                            </div>
-                            <div className="stat-item">
-                                <h4>Average Attendance</h4>
-                                <span>
-                                    {attendanceRecords.length > 0
-                                        ? Math.round(
-                                            attendanceRecords.reduce((acc, curr) => acc + curr.attendanceRate, 0) /
-                                            attendanceRecords.length
-                                        )
-                                        : 0}%
-                                </span>
-                            </div>
-                        </div>
-                        <table className="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th>Student ID</th>
-                                    <th>Total Classes</th>
-                                    <th>Present</th>
-                                    <th>Absent</th>
-                                    <th>Attendance Rate</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* 按学生统计的考勤数据 */}
-                            </tbody>
-                        </table>
-                    </div>
-                );
-        }
-    };
-
     return (
         <div className="courses-container">
             <div className="courses-header">
@@ -539,33 +376,22 @@ const TeacherCourses = () => {
                 </div>
             )}
 
-            {/* 修改考勤记录模态框 */}
+            {/* 考勤记录模态框 */}
             {showAttendanceList && (
                 <div className="modal-overlay" onClick={handleCloseAttendanceList}>
                     <div className="attendance-list-modal" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={handleCloseAttendanceList}>×</button>
                         <h2>Attendance Records</h2>
-                        <div className="view-selector">
-                            <button
-                                className={attendanceView === 'course' ? 'active' : ''}
-                                onClick={() => setAttendanceView('course')}
-                            >
-                                Course View
-                            </button>
-                            <button
-                                className={attendanceView === 'student' ? 'active' : ''}
-                                onClick={() => setAttendanceView('student')}
-                            >
-                                Student View
-                            </button>
-                            <button
-                                className={attendanceView === 'period' ? 'active' : ''}
-                                onClick={() => setAttendanceView('period')}
-                            >
-                                Period View
-                            </button>
-                        </div>
-                        {renderAttendanceView()}
+                        <Attendance 
+                            attendanceView={attendanceView}
+                            dateRange={dateRange}
+                            setDateRange={setDateRange}
+                            selectedStudentId={selectedStudentId}
+                            setSelectedStudentId={setSelectedStudentId}
+                            handleAttendanceQuery={handleAttendanceQuery}
+                            attendanceRecords={attendanceRecords}
+                            enrolledStudents={enrolledStudents}
+                        />
                     </div>
                 </div>
             )}
@@ -690,13 +516,22 @@ const TeacherCourses = () => {
                             </div>
                         </div>
                         <div className="modal-actions">
-                            <button className="modal-btn enrolled" onClick={handleViewEnrolledStudents}>
+                            <button 
+                                className="modal-btn enrolled"
+                                onClick={handleViewEnrolledStudents}
+                            >
                                 Enrolled Students
                             </button>
-                            <button className="modal-btn enroll" onClick={handleViewAttendance}>
+                            <button 
+                                className="modal-btn enroll"
+                                onClick={handleViewAttendance}
+                            >
                                 Attendance Situation
                             </button>
-                            <button className="modal-btn attendance" onClick={handleCreateAttendance}>
+                            <button 
+                                className="modal-btn attendance"
+                                onClick={handleCreateAttendance}
+                            >
                                 Create Attendance
                             </button>
                         </div>
