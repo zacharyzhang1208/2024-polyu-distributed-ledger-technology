@@ -470,9 +470,9 @@ class HttpServer {
                 else throw ex;
             }
         });
-
-        this.app.get('/operator/:addressId/balance', (req, res) => {
-            let addressId = req.params.addressId;
+        // 查询地址余额
+        this.app.get('/operator/balance', (req, res) => {
+            let addressId = req.query.addressId;
 
             try {
                 let balance = operator.getBalanceForAddress(addressId);
@@ -498,7 +498,7 @@ class HttpServer {
                     res.status(200).send({ confirmations: confirmations });
                 });
         });
-
+        // 挖矿
         this.app.post('/miner/mine', (req, res, next) => {
             miner.mine(req.body.rewardAddress, req.body['feeAddress'] || req.body.rewardAddress)
                 .then((newBlock) => {
@@ -776,6 +776,86 @@ class HttpServer {
                 });
             } catch (ex) {
                 throw new HTTPError(400, ex.message);
+            }
+        });
+
+        // 查询学生余额
+        this.app.post('/query/studentBalance', (req, res) => {
+            try {
+                const { studentId } = req.body;
+                
+                // 参数验证
+                if (!studentId) {
+                    throw new Error('studentId is required');
+                }
+
+                // 获取学生公钥
+                const studentKeys = operator.getStudentKeys(studentId);
+                if (!studentKeys) {
+                    throw new HTTPError(404, `Student not found with ID: ${studentId}`);
+                }
+
+                // 使用公钥查询余额
+                const balance = operator.getBalanceForAddress(studentKeys.publicKey);
+
+                res.status(200).send({
+                    success: true,
+                    studentId: studentId,
+                    publicKey: studentKeys.publicKey,
+                    balance: balance,
+                    message: `当前余额: ${balance}`
+                });
+
+            } catch (ex) {
+                res.status(ex.status || 400).send({
+                    success: false,
+                    message: ex.message
+                });
+            }
+        });
+
+        // 学生挖矿
+        this.app.post('/miner/studentMine', (req, res, next) => {
+            try {
+                const { studentId } = req.body;
+                
+                // 参数验证
+                if (!studentId) {
+                    throw new Error('studentId is required');
+                }
+
+                // 获取学生公钥作为奖励地址
+                const studentKeys = operator.getStudentKeys(studentId);
+                if (!studentKeys) {
+                    throw new HTTPError(404, `Student not found with ID: ${studentId}`);
+                }
+
+                // 使用学生公钥作为奖励地址进行挖矿
+                miner.mine(studentKeys.publicKey, studentKeys.publicKey)
+                    .then((newBlock) => {
+                        newBlock = Block.fromJson(newBlock);
+                        blockchain.addBlock(newBlock);
+                        res.status(201).send({
+                            success: true,
+                            studentId: studentId,
+                            blockHash: newBlock.hash,
+                            reward: Config.MINING_REWARD,
+                            message: `挖矿成功! 区块哈希: ${newBlock.hash}`
+                        });
+                    })
+                    .catch((ex) => {
+                        if (ex instanceof BlockAssertionError && ex.message.includes('Invalid index')) {
+                            next(new HTTPError(409, 'A new block were added before we were able to mine one'), null, ex);
+                        } else {
+                            next(ex);
+                        }
+                    });
+
+            } catch (ex) {
+                res.status(ex.status || 400).send({
+                    success: false,
+                    message: ex.message
+                });
             }
         });
 

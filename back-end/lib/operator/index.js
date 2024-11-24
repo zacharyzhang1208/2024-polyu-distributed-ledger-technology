@@ -669,6 +669,30 @@ class Operator {
         };
     }
 
+    // 根据学生ID获取公钥
+    getStudentPublicKey(studentId) {
+        if (!studentId) {
+            throw new ArgumentError('studentId is required');
+        }
+
+        let allTransactions = this.blockchain.getAllTransactions();
+        
+        // 找到学生注册交易
+        let studentTransaction = allTransactions.find(transaction => {
+            const metadata = transaction.data?.metadata;
+            return transaction.type === 'register' && 
+                   metadata?.category === 'register' && 
+                   metadata?.studentId === studentId;
+        });
+
+        if (!studentTransaction) {
+            throw new ArgumentError(`Student not found with ID: ${studentId}`);
+        }
+
+        // 只返回公钥
+        return studentTransaction.data.metadata.publicKey;
+    }
+
 }
 
 module.exports = Operator;
