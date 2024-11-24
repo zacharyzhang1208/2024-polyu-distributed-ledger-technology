@@ -104,6 +104,9 @@ const TeacherCourses = () => {
         startDate: '',
         endDate: ''
     });
+    const [showStudentDetail, setShowStudentDetail] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState(null);
+    const [studentAttendanceRecords, setStudentAttendanceRecords] = useState([]);
 
     // 从 localStorage 获取教师ID
     const teacherId = JSON.parse(localStorage.getItem('user'))?.id;
@@ -333,6 +336,34 @@ const TeacherCourses = () => {
         setSelectedStudentId('');  // 重置学生ID
     };
 
+    // 添加处理学生行点击的函数
+    const handleStudentRowClick = async (student) => {
+        try {
+            // 获取该学生在当前课程的所有考勤记录
+            const response = await getCourseAttendance({
+                courseId: selectedCourse.courseId,
+                studentId: student.studentId
+            });
+
+            // 按时间排序
+            const sortedRecords = response.records.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+
+            setStudentAttendanceRecords(sortedRecords);
+            setSelectedStudent(student);
+            setShowStudentDetail(true);
+        } catch (error) {
+            console.error('Failed to fetch student attendance records:', error);
+        }
+    };
+
+    // 添加关闭学生详情的函数
+    const handleCloseStudentDetail = () => {
+        setShowStudentDetail(false);
+        setSelectedStudent(null);
+    };
+
     return (
         <div className="courses-container">
             <div className="courses-header">
@@ -396,7 +427,7 @@ const TeacherCourses = () => {
                 </div>
             )}
 
-            {/* 修改已注册学生列表模态框 */}
+            {/* 修改已注册学生列表模态框，添加点击事件 */}
             {showEnrolledStudents && (
                 <div className="modal-overlay" onClick={handleCloseEnrolledStudents}>
                     <div className="enrolled-students-modal" onClick={e => e.stopPropagation()}>
@@ -428,7 +459,11 @@ const TeacherCourses = () => {
                                 </thead>
                                 <tbody>
                                     {enrolledStudents.map((student, index) => (
-                                        <tr key={index}>
+                                        <tr 
+                                            key={index}
+                                            onClick={() => handleStudentRowClick(student)}
+                                            className="clickable-row"
+                                        >
                                             <td>{student.studentId}</td>
                                             <td>{student.name}</td>
                                             <td>{student.enrollmentDate}</td>
@@ -476,6 +511,50 @@ const TeacherCourses = () => {
                                                 </span>
                                             </td>
                                             <td>{student.status === 'Present' ? student.checkInTime : '-'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 添加学生考勤详情模态框 */}
+            {showStudentDetail && selectedStudent && (
+                <div className="modal-overlay" onClick={handleCloseStudentDetail}>
+                    <div className="student-detail-modal" onClick={e => e.stopPropagation()}>
+                        <div className="detail-header">
+                            <button className="back-btn" onClick={handleCloseStudentDetail}>
+                                <i className="fas fa-arrow-left"></i> Back
+                            </button>
+                            <p><strong>Student ID:</strong> {selectedStudent.studentId}</p>
+                            <p><strong>Name:</strong> {selectedStudent.name}</p>
+                            <p><strong>Status:</strong> {selectedStudent.status}</p>
+                        </div>
+                        <div className="detail-table-container">
+                            <table className="detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Check-in Time</th>
+                                        <th>Verify Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {studentAttendanceRecords.map((record, index) => (
+                                        <tr key={index}>
+                                            <td>{new Date(record.timestamp).toLocaleDateString()}</td>
+                                            <td>{new Date(record.timestamp).toLocaleTimeString()}</td>
+                                            <td>
+                                                <span className={`status-badge ${record.status?.toLowerCase()}`}>
+                                                    {record.status || 'Absent'}
+                                                </span>
+                                            </td>
+                                            <td>{record.checkInTime || '-'}</td>
+                                            <td>{record.verifyCode}</td>
                                         </tr>
                                     ))}
                                 </tbody>
