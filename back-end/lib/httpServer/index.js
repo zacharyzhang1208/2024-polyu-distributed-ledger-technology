@@ -780,9 +780,9 @@ class HttpServer {
         });
 
         // 查询学生余额
-        this.app.post('/query/studentBalance', (req, res) => {
+        this.app.get('/query/studentBalance', (req, res) => {
             try {
-                const { studentId } = req.body;
+                const { studentId } = req.query;
                 
                 // 参数验证
                 if (!studentId) {
