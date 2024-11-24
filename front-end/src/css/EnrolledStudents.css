@@ -1,0 +1,75 @@
+.enrolled-students-view {
+    padding: 20px;
+}
+
+.enrolled-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-item h4 {
+    margin: 0 0 5px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.stat-item span {
+    font-size: 20px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.enrolled-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.enrolled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.enrolled-table th {
+    background: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #666;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.enrolled-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: #666;
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+    background-color: #f5f5f5;
+}
+
+.status-active {
+    background: #c6f6d5;
+    color: #2f855a;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+} 

@@ -14,6 +14,7 @@ import '../../css/CourseCard.css';
 import '../../css/Modal.css';
 import '../../css/Courses.css';
 import Attendance from '../Attendance/Index';
+import EnrolledStudents from '../EnrolledStudents/Index';
 
 // // 示例课程数据，添加更多详细信息
 // const coursesData = [
@@ -115,7 +116,7 @@ const TeacherCourses = () => {
     useEffect(() => {
         const loadTeacherCourses = async () => {
             try {
-                console.log('Loading courses for teacher:', teacherId); // 调试日志
+                console.log('Loading courses for teacher:', teacherId); // 调试日��
                 const response = await getTeacherCourses(teacherId);
                 console.log('Received courses:', response); // 调试日志
                 
@@ -427,54 +428,17 @@ const TeacherCourses = () => {
                 </div>
             )}
 
-            {/* 修改已注册学生列表模态框，添加点击事件 */}
+            {/* 修改已注册学生列表模态框 */}
             {showEnrolledStudents && (
                 <div className="modal-overlay" onClick={handleCloseEnrolledStudents}>
                     <div className="enrolled-students-modal" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={handleCloseEnrolledStudents}>×</button>
                         <h2>Enrolled Students</h2>
-                        <div className="enrolled-stats">
-                            <div className="stat-item">
-                                <h4>Total Enrolled</h4>
-                                <span>{enrolledStudents.length}</span>
-                            </div>
-                            <div className="stat-item">
-                                <h4>Available Seats</h4>
-                                <span>{selectedCourse.capacity - enrolledStudents.length}</span>
-                            </div>
-                            <div className="stat-item">
-                                <h4>Enrollment Rate</h4>
-                                <span>{Math.round((enrolledStudents.length / selectedCourse.capacity) * 100)}%</span>
-                            </div>
-                        </div>
-                        <div className="enrolled-table-container">
-                            <table className="enrolled-table">
-                                <thead>
-                                    <tr>
-                                        <th>Student ID</th>
-                                        <th>Name</th>
-                                        <th>Enrollment Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {enrolledStudents.map((student, index) => (
-                                        <tr 
-                                            key={index}
-                                            onClick={() => handleStudentRowClick(student)}
-                                            className="clickable-row"
-                                        >
-                                            <td>{student.studentId}</td>
-                                            <td>{student.name}</td>
-                                            <td>{student.enrollmentDate}</td>
-                                            <td>
-                                                <span className="status-active">{student.status}</span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <EnrolledStudents 
+                            enrolledStudents={enrolledStudents}
+                            selectedCourse={selectedCourse}
+                            onStudentClick={handleStudentRowClick}
+                        />
                     </div>
                 </div>
             )}
