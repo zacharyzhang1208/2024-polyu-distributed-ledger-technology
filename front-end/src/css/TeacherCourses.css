@@ -219,55 +219,6 @@
     }
 }
 
-.attendance-detail-modal {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
-    position: relative;
-    animation: modalSlideIn 0.3s ease-out;
-    display: flex;
-    flex-direction: column;
-}
-
-.attendance-detail-header {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin: 20px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.attendance-detail-table-container {
-    flex: 1;
-    overflow-y: auto;
-    margin-top: 20px;
-}
-
-.attendance-detail-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.attendance-detail-table th,
-.attendance-detail-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-
-.attendance-detail-table th {
-    background: #f8f9fa;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
 .status-badge {
     padding: 4px 8px;
     border-radius: 12px;

@@ -99,15 +99,12 @@ const TeacherCourses = () => {
         startDate: '',
         endDate: ''
     });
-    const [attendanceView, setAttendanceView] = useState('course'); // 'course', 'student', 'period'
+    
     const [selectedStudentId, setSelectedStudentId] = useState('');
     const [dateRange, setDateRange] = useState({
         startDate: '',
         endDate: ''
     });
-    const [showStudentDetail, setShowStudentDetail] = useState(false);
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [studentAttendanceRecords, setStudentAttendanceRecords] = useState([]);
 
     // 从 localStorage 获取教师ID
     const teacherId = JSON.parse(localStorage.getItem('user'))?.id;
@@ -116,7 +113,7 @@ const TeacherCourses = () => {
     useEffect(() => {
         const loadTeacherCourses = async () => {
             try {
-                console.log('Loading courses for teacher:', teacherId); // 调试日��
+                console.log('Loading courses for teacher:', teacherId); // 调试日志
                 const response = await getTeacherCourses(teacherId);
                 console.log('Received courses:', response); // 调试日志
                 
@@ -279,31 +276,6 @@ const TeacherCourses = () => {
         setShowEnrolledStudents(false);
     };
 
-    // 添加处理点击签到记录的函数
-    const handleAttendanceRowClick = (attendance) => {
-        setSelectedAttendance(attendance);
-        setShowAttendanceDetail(true);
-    };
-
-    // 关闭签到详情页面
-    const handleCloseAttendanceDetail = () => {
-        setShowAttendanceDetail(false);
-        setSelectedAttendance(null);
-    };
-
-    // 处理考勤记录筛选
-    const handleAttendanceFilter = async () => {
-        try {
-            const response = await getCourseAttendance({
-                courseId: selectedCourse.courseId,
-                ...attendanceFilters
-            });
-            setAttendanceRecords(response.records);
-        } catch (error) {
-            console.error('Failed to filter attendance:', error);
-        }
-    };
-
     // 处理考勤记录查询
     const handleAttendanceQuery = async () => {
         try {
@@ -327,42 +299,6 @@ const TeacherCourses = () => {
             console.error('Failed to fetch attendance records:', error);
             // 可以添加错误提示
         }
-    };
-
-    // 在视图切换时清空之前的记录
-    const handleViewChange = (view) => {
-        setAttendanceView(view);
-        setAttendanceRecords([]);  // 清空之前的记录
-        setDateRange({ startDate: '', endDate: '' });  // 重置日期范围
-        setSelectedStudentId('');  // 重置学生ID
-    };
-
-    // 添加处理学生行点击的函数
-    const handleStudentRowClick = async (student) => {
-        try {
-            // 获取该学生在当前课程的所有考勤记录
-            const response = await getCourseAttendance({
-                courseId: selectedCourse.courseId,
-                studentId: student.studentId
-            });
-
-            // 按时间排序
-            const sortedRecords = response.records.sort((a, b) => 
-                new Date(b.timestamp) - new Date(a.timestamp)
-            );
-
-            setStudentAttendanceRecords(sortedRecords);
-            setSelectedStudent(student);
-            setShowStudentDetail(true);
-        } catch (error) {
-            console.error('Failed to fetch student attendance records:', error);
-        }
-    };
-
-    // 添加关闭学生详情的函数
-    const handleCloseStudentDetail = () => {
-        setShowStudentDetail(false);
-        setSelectedStudent(null);
     };
 
     return (
@@ -415,12 +351,8 @@ const TeacherCourses = () => {
                         <button className="modal-close" onClick={handleCloseAttendanceList}>×</button>
                         <h2>Attendance Records</h2>
                         <Attendance 
-                            attendanceView={attendanceView}
                             dateRange={dateRange}
                             setDateRange={setDateRange}
-                            selectedStudentId={selectedStudentId}
-                            setSelectedStudentId={setSelectedStudentId}
-                            handleAttendanceQuery={handleAttendanceQuery}
                             attendanceRecords={attendanceRecords}
                             enrolledStudents={enrolledStudents}
                         />
@@ -437,93 +369,7 @@ const TeacherCourses = () => {
                         <EnrolledStudents 
                             enrolledStudents={enrolledStudents}
                             selectedCourse={selectedCourse}
-                            onStudentClick={handleStudentRowClick}
                         />
-                    </div>
-                </div>
-            )}
-
-            {/* 添加签到详情页面 */}
-            {showAttendanceDetail && selectedAttendance && (
-                <div className="modal-overlay" onClick={handleCloseAttendanceDetail}>
-                    <div className="attendance-detail-modal" onClick={e => e.stopPropagation()}>
-                        <button className="modal-close" onClick={handleCloseAttendanceDetail}>×</button>
-                        <h2>Attendance Detail</h2>
-                        <div className="attendance-detail-header">
-                            <p><strong>Date:</strong> {selectedAttendance.date}</p>
-                            <p><strong>Time:</strong> {selectedAttendance.time}</p>
-                            <p><strong>Attendance Rate:</strong> {selectedAttendance.rate}%</p>
-                        </div>
-                        <div className="attendance-detail-table-container">
-                            <table className="attendance-detail-table">
-                                <thead>
-                                    <tr>
-                                        <th>Student ID</th>
-                                        <th>Name</th>
-                                        <th>Status</th>
-                                        <th>Check-in Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedAttendance.students.map((student, index) => (
-                                        <tr key={index}>
-                                            <td>{student.id}</td>
-                                            <td>{student.name}</td>
-                                            <td>
-                                                <span className={`status-badge ${student.status.toLowerCase()}`}>
-                                                    {student.status}
-                                                </span>
-                                            </td>
-                                            <td>{student.status === 'Present' ? student.checkInTime : '-'}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* 添加学生考勤详情模态框 */}
-            {showStudentDetail && selectedStudent && (
-                <div className="modal-overlay" onClick={handleCloseStudentDetail}>
-                    <div className="student-detail-modal" onClick={e => e.stopPropagation()}>
-                        <div className="detail-header">
-                            <button className="back-btn" onClick={handleCloseStudentDetail}>
-                                <i className="fas fa-arrow-left"></i> Back
-                            </button>
-                            <p><strong>Student ID:</strong> {selectedStudent.studentId}</p>
-                            <p><strong>Name:</strong> {selectedStudent.name}</p>
-                            <p><strong>Status:</strong> {selectedStudent.status}</p>
-                        </div>
-                        <div className="detail-table-container">
-                            <table className="detail-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Time</th>
-                                        <th>Status</th>
-                                        <th>Check-in Time</th>
-                                        <th>Verify Code</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {studentAttendanceRecords.map((record, index) => (
-                                        <tr key={index}>
-                                            <td>{new Date(record.timestamp).toLocaleDateString()}</td>
-                                            <td>{new Date(record.timestamp).toLocaleTimeString()}</td>
-                                            <td>
-                                                <span className={`status-badge ${record.status?.toLowerCase()}`}>
-                                                    {record.status || 'Absent'}
-                                                </span>
-                                            </td>
-                                            <td>{record.checkInTime || '-'}</td>
-                                            <td>{record.verifyCode}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             )}

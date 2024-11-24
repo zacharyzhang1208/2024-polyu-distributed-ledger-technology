@@ -15,11 +15,3 @@
     margin-left: 70px;
     width: calc(100% - 70px);
 }
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 70px;
-        width: calc(100% - 70px);
-    }
-} 

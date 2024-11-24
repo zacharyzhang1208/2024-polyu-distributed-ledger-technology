@@ -5,6 +5,8 @@ import Login from '../Login/Index.jsx';
 import Sidebar from '../Sidebar/Index.jsx';
 import TeacherCourses from '../TeacherCourses/Index';
 import StudentCourses from '../StudentCourses/Index';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '../../css/App.css'
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);

@@ -109,7 +109,6 @@ const Attendance = ({
             {/* 详情视图 */}
             {showDetail && selectedRecord && (
                 <div className="attendance-detail-view">
-                    
                     <div className="detail-header">
                         <button className="back-btn" onClick={handleCloseDetail}>
                             <i className="fas fa-arrow-left"></i> Back
