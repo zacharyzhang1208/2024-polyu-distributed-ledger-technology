@@ -1,4 +1,4 @@
-import config from '../config';
+import config from './config';
 
 const createApiRequest = async (endpoint, options = {}) => {
     const defaultOptions = {
