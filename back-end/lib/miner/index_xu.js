@@ -15,8 +15,7 @@ class Miner {
         let baseBlock = Miner.generateNextBlock(rewardAddress, feeAddress, this.blockchain);
         //移除了包含'debug'的参数，避免调试模式影响子进程
         process.execArgv = R.reject((item) => item.includes('debug'), process.execArgv);
-
-       //建新的工作线程来执行挖矿计算
+        //建新的工作线程来执行挖矿计算
         //input：通过thread.send()传入的数据对象
         //done：回调函数，用于返回计算结果
         const thread = spawn(function (input, done) {
@@ -32,7 +31,6 @@ class Miner {
         //统计交易类型的数量并格式化输出
         //例如：输入[{type:'reward'}, {type:'fee'}, {type:'regular'}]
         //输出可能是：reward: 1, fee: 1, regular: 1
-
         const transactionList = R.pipe(
             R.countBy(R.prop('type')),
             R.toString,
@@ -63,17 +61,11 @@ class Miner {
         const index = previousBlock.index + 1;
         const previousHash = previousBlock.hash;
         const timestamp = new Date().getTime() / 1000;
-        const currentDifficulty = blockchain.getDifficulty();
+        const currentDifficulty = blockchain.getLastBlock().currentDifficulty;
         const blocks = blockchain.getAllBlocks();
         const candidateTransactions = blockchain.transactions;
         const transactionsInBlocks = R.flatten(R.map(R.prop('transactions'), blocks));
         const inputTransactionsInTransaction = R.compose(R.flatten, R.map(R.compose(R.prop('inputs'), R.prop('data'))));
-
-        // console.log('待处理交易:', candidateTransactions.map(tx => ({
-        //     id: tx.id,
-        //     type: tx.type,
-        //     metadata: tx.metadata
-        // })));
 
         // Select transactions that can be mined         
         let rejectedTransactions = [];
@@ -107,19 +99,7 @@ class Miner {
             }, transaction.data.inputs);
 
             if (R.all(R.equals(false), transactionInputFoundAnywhere)) {
-                // 检查是否为合法的交易类型
-                if ((transaction.type === 'regular' || 
-                     transaction.type === 'register' || 
-                     transaction.type === 'course' || 
-                     transaction.type === 'attendance' || 
-                     transaction.type === 'Ids'||
-                     transaction.type === 'lesson' ||
-                     transaction.type === 'enroll' ||
-                     transaction.type === 'regular' ||
-                     transaction.type === 'reward' ||
-                     transaction.type === 'fee'
-                    ) &&     
-                    negativeOutputsFound === 0) {
+                if (transaction.type === 'regular' || transaction.type === 'attendance' && negativeOutputsFound === 0) {
                     selectedTransactions.push(transaction);
                 } else if (transaction.type === 'reward') {
                     selectedTransactions.push(transaction);
@@ -132,12 +112,6 @@ class Miner {
         }, candidateTransactions);
 
         console.info(`Selected ${selectedTransactions.length} candidate transactions with ${rejectedTransactions.length} being rejected.`);
-
-        // console.log('已选择交易:', selectedTransactions.map(tx => ({
-        //     id: tx.id,
-        //     type: tx.type,
-        //     metadata: tx.metadata
-        // })));
 
         // Get the first two avaliable transactions, if there aren't TRANSACTIONS_PER_BLOCK, it's empty
         let transactions = R.defaultTo([], R.take(Config.TRANSACTIONS_PER_BLOCK, selectedTransactions));
