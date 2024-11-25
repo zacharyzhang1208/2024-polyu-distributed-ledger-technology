@@ -5,6 +5,7 @@ import Login from '../Login/Index.jsx';
 import Sidebar from '../Sidebar/Index.jsx';
 import TeacherCourses from '../TeacherCourses/Index';
 import StudentCourses from '../StudentCourses/Index';
+import Profile from '../Profile/Index';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../../css/App.css'
 
@@ -37,8 +38,6 @@ function App() {
                             <div style={{ display: 'flex' }}>
                                 <Sidebar 
                                     userType={userType}
-                                    collapsed={sidebarCollapsed}
-                                    onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                                     onLogout={handleLogout}
                                 />
                                 <div style={{ 
@@ -48,6 +47,7 @@ function App() {
                                     <Routes>
                                         <Route path="/student_courses" element={<StudentCourses />} />
                                         <Route path="/teacher_courses" element={<TeacherCourses />} />
+                                        <Route path="/profile" element={<Profile userType={userType}/>} />
                                     </Routes>
                                 </div>
                             </div>

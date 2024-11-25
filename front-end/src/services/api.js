@@ -1,4 +1,5 @@
 import config from './config';
+import axios from 'axios';
 
 const createApiRequest = async (endpoint, options = {}) => {
     const defaultOptions = {
@@ -78,6 +79,17 @@ export const getCourseAttendance = async (params) => {
 export const createLessonAttendance = async (data) => {
     return createApiRequest(config.endpoints.createLesson, {
         method: 'POST',
+        body: JSON.stringify(data)
+    });
+};
+
+export const getUserProfile = () => {
+    return axios.get('/api/user/profile');
+};
+
+export const updateUserProfile = (data) => {
+    return createApiRequest(config.endpoints.updateProfile, {
+        method: 'PUT',
         body: JSON.stringify(data)
     });
 }; 
