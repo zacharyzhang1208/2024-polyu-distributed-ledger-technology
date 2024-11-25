@@ -72,7 +72,7 @@ const Wallet = () => {
 
         {/* Settings Section */}
         <div className="section-card">
-          <h2 className="section-title">MiningSettings</h2>
+          <h2 className="section-title">Mining Settings</h2>
           <form className="settings-form">
             <div className="settings-group">
               <div className="settings-item">
@@ -94,13 +94,15 @@ const Wallet = () => {
               </div>
             </div>
 
-              <Button 
-                type="submit"
-                loading={loading}
-                disabled={loading}
-              >
-                Save Settings
-              </Button>
+            {settings.allowMining && (
+                <Button 
+                  type="submit"
+                  loading={loading}
+                  disabled={loading}
+                >
+                  Start Mining
+                </Button>
+            )}
           </form>
         </div>
       </div>
