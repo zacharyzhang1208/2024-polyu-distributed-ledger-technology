@@ -92,4 +92,8 @@ export const updateUserProfile = (data) => {
         method: 'PUT',
         body: JSON.stringify(data)
     });
+};
+
+export const getWalletBalance = () => {
+    return createApiRequest(config.endpoints.walletBalance);
 }; 

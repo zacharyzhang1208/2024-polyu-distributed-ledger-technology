@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getUserProfile, updateUserProfile } from '../../services/api';
+import { getUserProfile, updateUserProfile, getWalletBalance } from '../../services/api';
 import Button from '../common/Button/Index';
 import '../../css/Profile.css';
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile' or 'settings'
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'wallet' or 'settings'
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,7 +20,10 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserProfile();
-  }, []);
+    if (activeTab === 'wallet') {
+      fetchWalletBalance();
+    }
+  }, [activeTab]);
 
   const fetchUserProfile = async () => {
     try {
@@ -29,6 +33,18 @@ const Profile = () => {
       setFormData(response.data);
     } catch (error) {
       alert('Failed to fetch profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchWalletBalance = async () => {
+    try {
+      setLoading(true);
+      const response = await getWalletBalance();
+      setWalletBalance(response.data.balance);
+    } catch (error) {
+      alert('Failed to fetch wallet balance');
     } finally {
       setLoading(false);
     }
@@ -100,6 +116,12 @@ const Profile = () => {
           Profile
         </button>
         <button 
+          className={`tab-button ${activeTab === 'wallet' ? 'active' : ''}`}
+          onClick={() => setActiveTab('wallet')}
+        >
+          Wallet
+        </button>
+        <button 
           className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
           onClick={() => setActiveTab('settings')}
         >
@@ -160,6 +182,24 @@ const Profile = () => {
             </Button>
           </form>
         </>
+      ) : activeTab === 'wallet' ? (
+        <div className="wallet-section">
+          <h2 className="profile-title">My Wallet</h2>
+          <div className="wallet-card">
+            <div className="balance-info">
+              <div className="balance-label">Current Balance</div>
+              <div className="balance-amount">${walletBalance.toFixed(2)}</div>
+            </div>
+            <div className="wallet-actions">
+              <Button 
+                onClick={fetchWalletBalance}
+                loading={loading}
+              >
+                Refresh Balance
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="settings-section">
           <h2 className="profile-title">Settings</h2>
