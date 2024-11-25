@@ -33,16 +33,16 @@ module.exports = {
                         category: 'genesis',
                     },
                     List: [  // 添加 ID 列表
-                        '123456a', 
-                        '123456b', 
-                        '123456c',
-                        '123456d',
-                        '123456e',
-                        '123456f',
-                        '123456g',
-                        '123456h',
-                        '456789t',
-                        '1232456t'
+                        '20240001g', 
+                        '20240002g', 
+                        '20240003g',
+                        '20240004g',
+                        '20240005g',
+                        '20240006g',
+                        '20240007g',
+                        '20240008g',
+                        '202410000t',
+                        '240242000t'
                     ]
                 }
             }
@@ -51,7 +51,7 @@ module.exports = {
     pow: {
         getDifficulty: (blocks, index) => {
             // 基础难度值
-            const BASE_DIFFICULTY = 100000000000;
+            const BASE_DIFFICULTY = 10000000000000;//加了两个0
             // 每N个区块调整一次难度
             const DIFFICULTY_ADJUSTMENT_INTERVAL = 5;
             // 目标出块时间(秒)
