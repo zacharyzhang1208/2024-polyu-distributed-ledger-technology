@@ -5,7 +5,7 @@ import Login from '../Login/Index.jsx';
 import Sidebar from '../common/Sidebar/Index.jsx';
 import TeacherCourses from '../TeacherCourses/Index';
 import StudentCourses from '../StudentCourses/Index';
-import Profile from '../Profile/Index';
+import Wallet from '../Wallet/Index.jsx';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../../css/App.css'
 
@@ -44,7 +44,7 @@ function App() {
                                     <Routes>
                                         <Route path="/student_courses" element={<StudentCourses />} />
                                         <Route path="/teacher_courses" element={<TeacherCourses />} />
-                                        <Route path="/profile" element={<Profile user/>} />
+                                        <Route path="/wallet" element={<Wallet user/>} />
                                     </Routes>
                                 </div>
                             </div>

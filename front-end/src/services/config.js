@@ -8,7 +8,8 @@ const config = {
         teacherCourses: '/query/teacherCourses',
         courseAttendance: '/query/attendance',
         courseEnrolledStudents: '/query/courseEnrolledStudents',
-        createLesson: '/operator/lessonPublish'
+        createLesson: '/operator/lessonPublish',
+        walletBalance: '/query/studentBalance'
     }
 };
 

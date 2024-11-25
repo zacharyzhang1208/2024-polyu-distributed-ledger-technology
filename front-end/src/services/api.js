@@ -95,6 +95,6 @@ export const updateUserProfile = (data) => {
     });
 };
 
-export const getWalletBalance = () => {
-    return createApiRequest(config.endpoints.walletBalance);
+export const getWalletBalance = (studentId) => {
+    return createApiRequest(`${config.endpoints.walletBalance}?studentId=${studentId}`);
 }; 
