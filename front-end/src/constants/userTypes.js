@@ -16,6 +16,6 @@ export const USER_ROUTES = {
 
 // 定义每种用户类型的默认首页路由
 export const DEFAULT_ROUTES = {
-    [USER_TYPES.STUDENT]: '/wallet',
+    [USER_TYPES.STUDENT]: '/student_courses',
     [USER_TYPES.TEACHER]: '/teacher_courses'
 };
