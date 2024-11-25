@@ -1,5 +1,8 @@
 .attendance-view {
     padding: 20px;
+    background: white;
+    border-radius: 8px;
+    position: relative;
 }
 
 .attendance-header {
@@ -55,57 +58,57 @@
 }
 
 .attendance-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 15px;
+    margin: 20px 0;
+    width: 100%;
 }
 
 .stat-item {
-    background: #f8f9fa;
-    padding: 10px;
+    background-color: #f8f9fa;
+    padding: 16px;
     border-radius: 8px;
-    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .stat-item h4 {
-    margin: 0 0 5px 0;
+    margin: 0;
     color: #666;
-    font-size: 13px;
+    font-weight: 500;
 }
 
 .stat-item span {
-    font-size: 20px;
-    font-weight: bold;
-    color: #667eea;
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a90e2;
 }
 
 .attendance-table-container {
-    max-height: 400px;
+    margin-top: 20px;
+    overflow-x: auto;
+    max-height: 300px;
     overflow-y: auto;
 }
 
 .attendance-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
 }
 
-.attendance-table th {
-    background: #f8f9fa;
-    padding: 12px;
-    text-align: left;
-    font-weight: 600;
-    color: #666;
+.attendance-table thead th {
     position: sticky;
     top: 0;
+    background: white;
     z-index: 1;
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #eee;
 }
 
-.attendance-table td {
-    padding: 12px;
+.attendance-table tbody td {
+    padding: 8px;
     border-bottom: 1px solid #eee;
-    color: #666;
 }
 
 .clickable-row {
@@ -154,7 +157,9 @@
 }
 
 .detail-table-container {
-    max-height: 400px;
+    overflow-x: auto;
+    margin-top: 20px;
+    max-height: calc(100vh - 300px);
     overflow-y: auto;
 }
 
@@ -193,4 +198,174 @@
 .status-badge.absent {
     background: #fed7d7;
     color: #c53030;
+}
+
+.status {
+    font-weight: 500;
+    text-align: center;
+}
+
+.status.present {
+    color: #28a745;
+}
+
+.status.absent {
+    color: #dc3545;
+}
+
+.detail-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.status-icon {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.status-present {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.status-present .status-icon {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-text {
+    text-transform: capitalize;
+}
+
+.detail-table td {
+    vertical-align: middle;
+    padding: 12px;
+    text-align: center;
+}
+
+.detail-table tr:hover .status-cell {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* 为考勤记录表格的行添加鼠标指针和悬停效果 */
+.attendance-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.attendance-table tbody tr:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.attendance-view::-webkit-scrollbar,
+.detail-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.attendance-view::-webkit-scrollbar-track,
+.detail-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.attendance-view::-webkit-scrollbar-thumb,
+.detail-table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.attendance-view::-webkit-scrollbar-thumb:hover,
+.detail-table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.attendance-stats,
+.attendance-header,
+.detail-header {
+    position: relative;
+    z-index: 2;
+    background: white;
+}
+
+.error-message {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    padding: 12px 20px;
+    background-color: #fff3f3;
+    border-left: 4px solid #dc3545;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+    max-width: 90%;
+}
+
+.error-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #dc3545;
+    font-size: 14px;
+}
+
+.error-icon {
+    font-size: 18px;
+}
+
+.error-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.error-close:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 确保错误消息不会被其他内容遮挡 */
+.attendance-header,
+.attendance-stats,
+.attendance-table-container {
+    position: relative;
+    z-index: 1;
 }

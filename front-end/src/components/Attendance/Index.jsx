@@ -1,28 +1,82 @@
 import React, { useState } from 'react';
 import '../../css/Attendance.css';
+import { generateRandomName } from '../../utils/nameGenerator';
+
+import { 
+    getTeacherCourses, 
+    getCourseAttendance, 
+    getCourseEnrolledStudents,
+    createLessonAttendance 
+} from '../../services/api';
 
 const Attendance = ({
     dateRange,
     setDateRange,
     handleAttendanceQuery,
     attendanceRecords,
-    enrolledStudents
+    courseId,  
+    lessonHistory
 }) => {
+    console.log("attendanceRecords", attendanceRecords);
+
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const [enrolledStudents, setEnrolledStudents] = useState([]);
+    const [error, setError] = useState(null);
 
-    const handleRowClick = (record) => {
-        setSelectedRecord(record);
-        setShowDetail(true);
+    const handleRowClick = async (record) => {
+        setError(null);
+        try {
+            const date = new Date(record.timestamp)
+                .toISOString()
+                .split('T')[0];
+            
+            const response = await getCourseAttendance({ courseId: courseId, startDate: date});
+            
+            const emptyRecord = {
+                courseId: courseId,
+                date: date,
+                students: [],
+                timestamp: record.timestamp,
+                verifyCode: record.verifyCode
+            };
+
+            const records = response.total === 0 ? [emptyRecord] : response.records;
+            setSelectedRecord({ ...record, detailedData: records[0] });
+            setShowDetail(true);
+        } catch (error) {
+            console.error('Failed to load attendance records:', error);
+            const emptyRecord = {
+                courseId: courseId,
+                date: new Date(record.timestamp).toISOString().split('T')[0],
+                students: [],
+                timestamp: record.timestamp,
+                verifyCode: record.verifyCode
+            };
+            setSelectedRecord({ ...record, detailedData: emptyRecord });
+            setShowDetail(true);
+        }
     };
 
     const handleCloseDetail = () => {
         setShowDetail(false);
         setSelectedRecord(null);
+        setError(null); // 清除错误状态
     };
 
     return (
         <div className="attendance-view">
+            {/* 错误提示 */}
+            {error && (
+                <div className="error-message">
+                    <div className="error-content">
+                        <span className="error-icon">⚠️</span>
+                        <span>{error}</span>
+                        <button className="error-close" onClick={() => setError(null)}>×</button>
+                    </div>
+                </div>
+            )}
+
             {/* 主视图 */}
             {!showDetail && (
                 <>
@@ -46,30 +100,14 @@ const Attendance = ({
                             </div>
                             <button className="search-btn" onClick={handleAttendanceQuery}>
                                 Search
-                            </button>
+                            </button>   
                         </div>
                     </div>
 
                     <div className="attendance-stats">
                         <div className="stat-item">
                             <h4>Total Classes</h4>
-                            <span>{attendanceRecords.length}</span>
-                        </div>
-                        <div className="stat-item">
-                            <h4>Total Students</h4>
-                            <span>{enrolledStudents.length}</span>
-                        </div>
-                        <div className="stat-item">
-                            <h4>Average Attendance</h4>
-                            <span>
-                                {attendanceRecords.length > 0
-                                    ? Math.round(
-                                        attendanceRecords.reduce((acc, curr) => 
-                                            acc + (curr.present / enrolledStudents.length) * 100, 0
-                                        ) / attendanceRecords.length
-                                    )
-                                    : 0}%
-                            </span>
+                            <span>{lessonHistory.lessons.length}</span>
                         </div>
                     </div>
 
@@ -79,24 +117,14 @@ const Attendance = ({
                                 <tr>
                                     <th>Date</th>
                                     <th>Time</th>
-                                    <th>Present</th>
-                                    <th>Absent</th>
-                                    <th>Attendance Rate</th>
                                     <th>Verify Code</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {attendanceRecords.map((record, index) => (
-                                    <tr 
-                                        key={index}
-                                        onClick={() => handleRowClick(record)}
-                                        className="clickable-row"
-                                    >
+                                {lessonHistory?.lessons?.map((record, index) => (
+                                    <tr key={index} onClick={() => handleRowClick(record)}>
                                         <td>{new Date(record.timestamp).toLocaleDateString()}</td>
                                         <td>{new Date(record.timestamp).toLocaleTimeString()}</td>
-                                        <td>{record.present || 0}</td>
-                                        <td>{enrolledStudents.length - (record.present || 0)}</td>
-                                        <td>{Math.round((record.present || 0) / enrolledStudents.length * 100)}%</td>
                                         <td>{record.verifyCode}</td>
                                     </tr>
                                 ))}
@@ -128,21 +156,25 @@ const Attendance = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {enrolledStudents.map((student, index) => {
-                                    const isPresent = selectedRecord.studentIds?.includes(student.studentId);
-                                    return (
+                                {selectedRecord.detailedData?.students
+                                    .filter(student => student.verifyCode === selectedRecord.verifyCode)
+                                    .map((student, index) => (
                                         <tr key={index}>
                                             <td>{student.studentId}</td>
-                                            <td>{student.name || 'Student Name'}</td>
-                                            <td>
-                                                <span className={`status-badge ${isPresent ? 'present' : 'absent'}`}>
-                                                    {isPresent ? 'Present' : 'Absent'}
-                                                </span>
+                                            <td>{generateRandomName()}</td>
+                                            <td className="status-cell status-present">
+                                                <span className="status-icon">✓</span>
+                                                <span className="status-text">Present</span>
                                             </td>
-                                            <td>{isPresent ? selectedRecord.checkInTime || '-' : '-'}</td>
+                                            <td>
+                                                {student.timestamp ? 
+                                                    new Date(student.timestamp).toLocaleTimeString() 
+                                                    : '-'
+                                                }
+                                            </td>
                                         </tr>
-                                    );
-                                })}
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>
