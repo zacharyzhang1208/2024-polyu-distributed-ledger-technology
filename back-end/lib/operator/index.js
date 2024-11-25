@@ -693,6 +693,78 @@ class Operator {
         return studentTransaction.data.metadata.publicKey;
     }
 
+    // 登录操作
+    createLoginTransaction(userId, password) {
+        try {
+            // 1. 从区块链获取用户注册信息
+            let allTransactions = this.blockchain.getAllTransactions();
+            let registerTransaction = allTransactions.find(transaction => {
+                const metadata = transaction.data?.metadata;
+                return transaction.type === 'register' && 
+                       metadata?.category === 'register' && 
+                       (metadata?.studentId === userId || metadata?.teacherId === userId);
+            });
+
+            if (!registerTransaction) {
+                throw new ArgumentError(`User not found with ID: ${userId}`);
+            }
+
+            // 获取用户的公钥和加密的私钥
+            const userPublicKey = registerTransaction.data.metadata.publicKey;
+            const encryptedSecretKey = registerTransaction.data.metadata.secretKey;
+
+            // 2. 使用密码解密私钥
+            const userSecretKey = SymmetricCrypto.decrypt(encryptedSecretKey, password);
+            if (!userSecretKey) {
+                throw new ArgumentError('Invalid password');
+            }
+
+            // 3. 构建登录交易的metadata
+            let metadataContent = {
+                category: 'login',
+                userId: userId,
+                userType: registerTransaction.data.metadata.studentId ? 'student' : 'teacher',
+                timestamp: new Date().getTime(),
+                loginTime: new Date().toISOString()
+            };
+
+            // 对metadata进行哈希和签名
+            const metadataString = JSON.stringify(metadataContent);
+            const metadataHash = CryptoUtil.hash(metadataString);
+            const signature = CryptoEdDSAUtil.signMessage(userSecretKey, metadataHash);
+
+            let metadata = {
+                ...metadataContent,
+                hash: signature
+            };
+
+            // 4. 创建一笔从用户地址到faucet地址的交易
+            let utxo = this.blockchain.getUnspentTransactionsForAddress(userPublicKey);
+            if (!utxo || utxo.length === 0) {
+                throw new ArgumentError(`No unspent transactions found for address: ${userPublicKey}`);
+            }
+
+            let tx = new TransactionBuilder();
+            tx.from(utxo);
+            tx.to(Config.FAUCET_ADDRESS, 0); // 发送0个代币到faucet地址
+            tx.change(userPublicKey);        // 找零地址设为用户地址
+            tx.fee(Config.FEE_PER_TRANSACTION);
+            tx.setType('regular');           // 设置交易类型为regular
+            tx.sign(userSecretKey);          // 使用用户私钥签名
+            tx.setMetadata(metadata);        // 设置metadata
+
+            return {
+                transaction: Transaction.fromJson(tx.build()),
+                userType: registerTransaction.data.metadata.studentId ? 'student' : 'teacher',
+                publicKey: userPublicKey
+            };
+
+        } catch (error) {
+            console.error('Login transaction creation failed:', error);
+            throw error;
+        }
+    }
+
 }
 
 module.exports = Operator;

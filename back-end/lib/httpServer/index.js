@@ -286,7 +286,7 @@ class HttpServer {
                 // 50为初始余额
                 let faucetWalletId = Config.FAUCET_WALLET_ID;
                 let newTransaction = operator.createTeacherRegisterTransaction(teacher.walletId, faucetAddress, teacher.publicKey, 
-                                                                        teacherId, teacher.publicKey, teacher.encryptedSecretKey, 1);
+                                                                        teacherId, teacher.publicKey, teacher.encryptedSecretKey, 50);
                 // 检查交易
                 newTransaction.check();
 
@@ -865,6 +865,42 @@ class HttpServer {
             res.send(err.message + (err.cause ? ' - ' + err.cause.message : ''));
         });
 
+        // 登录
+        this.app.post('/operator/login', (req, res) => {
+            try {
+                const { userId, password } = req.body;
+        
+            if (!userId || !password) {
+                throw new HTTPError(400, 'Missing required parameters');
+            }
+
+            const loginResult = operator.createLoginTransaction(userId, password);
+            
+            // 将交易添加到区块链
+            const transactionCreated = blockchain.addTransaction(loginResult.transaction);
+
+            res.status(200).send({
+                success: true,
+                userType: loginResult.userType,
+                publicKey: loginResult.publicKey,
+                transaction: transactionCreated,
+                message: 'Login successful'
+        });
+
+    } catch (ex) {
+        res.status(ex.status || 400).send({
+            success: false,
+            message: ex.message
+        });
+            }
+        });
+
+        
+
+
+
+
+    
     }
 
     

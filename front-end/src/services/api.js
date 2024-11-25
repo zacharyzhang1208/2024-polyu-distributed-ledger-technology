@@ -84,7 +84,8 @@ export const createLessonAttendance = async (data) => {
 };
 
 export const getUserProfile = () => {
-    return axios.get('/api/user/profile');
+    // return axios.get('/api/user/profile');
+    return createApiRequest(config.endpoints.userProfile);
 };
 
 export const updateUserProfile = (data) => {
