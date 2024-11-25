@@ -12,7 +12,6 @@ import '../../css/App.css'
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState(USER_TYPES.STUDENT);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // 登录处理函数
     const handleLogin = (type) => {
@@ -40,16 +39,13 @@ function App() {
                                     userType={userType}
                                     onLogout={handleLogout}
                                 />
-                                <div style={{ 
-                                    marginLeft: sidebarCollapsed ? '70px' : '250px', 
-                                    width: sidebarCollapsed ? 'calc(100% - 70px)' : 'calc(100% - 250px)'
-                                }}>
-                                    <Routes>
-                                        <Route path="/student_courses" element={<StudentCourses />} />
-                                        <Route path="/teacher_courses" element={<TeacherCourses />} />
-                                        <Route path="/profile" element={<Profile user/>} />
-                                    </Routes>
-                                </div>
+                                
+                                <Routes>
+                                    <Route path="/student_courses" element={<StudentCourses />} />
+                                    <Route path="/teacher_courses" element={<TeacherCourses />} />
+                                    <Route path="/profile" element={<Profile user/>} />
+                                </Routes>
+                                
                             </div>
                         ) : (
                             <Navigate to="/login" replace />

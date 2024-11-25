@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { USER_TYPES, USER_ROUTES } from '../../../constants/userTypes';
 import '../../../css/Sidebar.css';
 
-const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogou   t }) => {
+const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogout }) => {
     const navigate = useNavigate();
     const location = useLocation();
     
