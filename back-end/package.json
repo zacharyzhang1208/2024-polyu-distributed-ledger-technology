@@ -20,6 +20,7 @@
     "diagrams": "mmdc -i doc/blockchain.mmd -o doc/blockchain.png -b transparent && mmdc -i doc/components.mmd -o doc/components.png -b transparent"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "body-parser": "^1.17.1",
     "cli-color": "^1.2.0",
     "cors": "^2.8.5",

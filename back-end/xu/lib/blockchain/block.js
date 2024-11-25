@@ -53,6 +53,7 @@ class Block {
         block.hash = block.toHash();
         return block;
     }
+
     static calculateCumulativeDifficulty(blocks) {
         return blocks.reduce((sum, block) => {
             // 使用2^(256-hash前导零数)来计算每个区块的难度
@@ -60,6 +61,7 @@ class Block {
             return sum + difficulty;
         }, 0);
     }
+
 }
 
 module.exports = Block;
