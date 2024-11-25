@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import CourseCard from '../common/CourseCard/Index';
 import SearchBar from '../common/SearchBar/Index';
+import { generateRandomName } from '../../utils/nameGenerator';
 import { 
     getTeacherCourses, 
     getCourseAttendance, 
@@ -15,13 +16,6 @@ import '../../css/Modal.css';
 import '../../css/Courses.css';
 import Attendance from '../Attendance/Index';
 import EnrolledStudents from '../EnrolledStudents/Index';
-
-// 生成随机名字的辅助函数
-const generateRandomName = () => {
-    const firstNames = ['John', 'Emma', 'Michael', 'Sarah', 'David', 'Lisa', 'James', 'Mary'];
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis'];
-    return `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
-};
 
 const TeacherCourses = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -199,7 +193,7 @@ const TeacherCourses = () => {
         try {
             const response = await getCourseEnrolledStudents(selectedCourse.courseId);
             
-            // 为每个学生添加随机名字
+            // 使用导入的 generateRandomName 函数
             const studentsWithNames = response.students.map(student => ({
                 ...student,
                 name: generateRandomName(),

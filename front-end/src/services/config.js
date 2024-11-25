@@ -7,9 +7,10 @@ const config = {
         teacherRegister: '/operator/teacherRegister',
         teacherCourses: '/query/teacherCourses',
         courseAttendance: '/query/attendance',
-        courseEnrolledStudents: '/query/courseEnrolledStudents',
+        studentEnrolledCourses: '/query/studentEnrolledCourses',
         createLesson: '/operator/lessonPublish',
-        walletBalance: '/query/studentBalance'
+        walletBalance: '/query/studentBalance',
+        startMining: '/miner/studentMine'
     }
 };
 
