@@ -1,5 +1,4 @@
 import config from './config';
-import axios from 'axios';
 
 const createApiRequest = async (endpoint, options = {}) => {
     const defaultOptions = {
@@ -9,15 +8,17 @@ const createApiRequest = async (endpoint, options = {}) => {
             'Content-Type': 'application/json'
         }
     };
+    const fullUrl = `${config.baseURL}${endpoint}`;
+    console.log('Requesting:', fullUrl); // 调试日志
 
-    const response = await fetch(endpoint, {
+    const response = await fetch(fullUrl, {
         ...defaultOptions,
         ...options
     });
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || '请求失败');
+        throw new Error(error.message || 'Request failed');
     }
 
     return response.json();
@@ -73,6 +74,7 @@ export const getCourseEnrolledStudents = async (courseId) => {
 
 export const getCourseAttendance = async (params) => {
     const queryParams = new URLSearchParams(params).toString();
+    console.log(queryParams);
     return createApiRequest(`${config.endpoints.courseAttendance}?${queryParams}`);
 };
 
@@ -99,8 +101,15 @@ export const getWalletBalance = (studentId) => {
     return createApiRequest(`${config.endpoints.walletBalance}?studentId=${studentId}`);
 };
 
+export const getCourseLessonHistory = (courseId) => {
+    return createApiRequest(`${config.endpoints.courseLessonHistory}?courseId=${courseId}`);
+};
+
 export const startMining = (studentId) => {
-    return createApiRequest(`${config.endpoints.startMining}?studentId=${studentId}`, {
+    console.log("start mining");
+    console.log(config.endpoints.startMining);
+    console.log(studentId);
+    return createApiRequest(`${config.endpoints.startMining}`, {
         method: 'POST',
         body: JSON.stringify({ studentId })
     });

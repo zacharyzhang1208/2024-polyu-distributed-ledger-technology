@@ -1,5 +1,10 @@
 .attendance-view {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
     padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .attendance-header {
@@ -81,8 +86,8 @@
 }
 
 .attendance-table-container {
-    max-height: 400px;
-    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 20px;
 }
 
 .attendance-table {
@@ -154,7 +159,9 @@
 }
 
 .detail-table-container {
-    max-height: 400px;
+    overflow-x: auto;
+    margin-top: 20px;
+    max-height: calc(100vh - 300px);
     overflow-y: auto;
 }
 
@@ -193,4 +200,112 @@
 .status-badge.absent {
     background: #fed7d7;
     color: #c53030;
+}
+
+.status {
+    font-weight: 500;
+    text-align: center;
+}
+
+.status.present {
+    color: #28a745;
+}
+
+.status.absent {
+    color: #dc3545;
+}
+
+.detail-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.status-icon {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.status-present {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.status-present .status-icon {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-text {
+    text-transform: capitalize;
+}
+
+.detail-table td {
+    vertical-align: middle;
+    padding: 12px;
+    text-align: center;
+}
+
+.detail-table tr:hover .status-cell {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* 为考勤记录表格的行添加鼠标指针和悬停效果 */
+.attendance-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.attendance-table tbody tr:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.attendance-view::-webkit-scrollbar,
+.detail-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.attendance-view::-webkit-scrollbar-track,
+.detail-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.attendance-view::-webkit-scrollbar-thumb,
+.detail-table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.attendance-view::-webkit-scrollbar-thumb:hover,
+.detail-table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.attendance-stats,
+.attendance-header,
+.detail-header {
+    position: relative;
+    z-index: 2;
+    background: white;
 }

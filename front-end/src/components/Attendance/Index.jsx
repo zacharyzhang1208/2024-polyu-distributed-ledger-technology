@@ -1,19 +1,47 @@
 import React, { useState } from 'react';
 import '../../css/Attendance.css';
+import { generateRandomName } from '../../utils/nameGenerator';
+
+import { 
+    getTeacherCourses, 
+    getCourseAttendance, 
+    getCourseEnrolledStudents,
+    createLessonAttendance 
+} from '../../services/api';
 
 const Attendance = ({
     dateRange,
     setDateRange,
     handleAttendanceQuery,
     attendanceRecords,
-    enrolledStudents
+    courseId,  
+    lessonHistory
 }) => {
+    console.log("attendanceRecords", attendanceRecords);
+
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const [enrolledStudents, setEnrolledStudents] = useState([]);
 
-    const handleRowClick = (record) => {
-        setSelectedRecord(record);
-        setShowDetail(true);
+    const handleRowClick = async (record) => {
+        console.log(record)
+        try {
+            const date = new Date(record.timestamp)
+                .toISOString()
+                .split('T')[0];
+            console.log("date", date);
+            const response = await getCourseAttendance({ courseId: courseId, startDate: date});
+            console.log("response", response);
+            if(response.total === 0) throw new Error("No attendance records found");
+            const records = response.records;
+            console.log("response.records", records);
+            console.log("records.students", records[0].students);
+            setSelectedRecord({ ...record, detailedData: records[0] });
+            console.log("selectedRecord", selectedRecord);
+            setShowDetail(true);
+        } catch (error) {
+            console.error('Failed to load enrolled students:', error);
+        }
     };
 
     const handleCloseDetail = () => {
@@ -46,14 +74,14 @@ const Attendance = ({
                             </div>
                             <button className="search-btn" onClick={handleAttendanceQuery}>
                                 Search
-                            </button>
+                            </button>   
                         </div>
                     </div>
 
                     <div className="attendance-stats">
                         <div className="stat-item">
                             <h4>Total Classes</h4>
-                            <span>{attendanceRecords.length}</span>
+                            <span>{lessonHistory.lessons.length}</span>
                         </div>
                         <div className="stat-item">
                             <h4>Total Students</h4>
@@ -79,24 +107,14 @@ const Attendance = ({
                                 <tr>
                                     <th>Date</th>
                                     <th>Time</th>
-                                    <th>Present</th>
-                                    <th>Absent</th>
-                                    <th>Attendance Rate</th>
                                     <th>Verify Code</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {attendanceRecords.map((record, index) => (
-                                    <tr 
-                                        key={index}
-                                        onClick={() => handleRowClick(record)}
-                                        className="clickable-row"
-                                    >
+                                {lessonHistory?.lessons?.map((record, index) => (
+                                    <tr key={index} onClick={() => handleRowClick(record)}>
                                         <td>{new Date(record.timestamp).toLocaleDateString()}</td>
                                         <td>{new Date(record.timestamp).toLocaleTimeString()}</td>
-                                        <td>{record.present || 0}</td>
-                                        <td>{enrolledStudents.length - (record.present || 0)}</td>
-                                        <td>{Math.round((record.present || 0) / enrolledStudents.length * 100)}%</td>
                                         <td>{record.verifyCode}</td>
                                     </tr>
                                 ))}
@@ -128,21 +146,17 @@ const Attendance = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {enrolledStudents.map((student, index) => {
-                                    const isPresent = selectedRecord.studentIds?.includes(student.studentId);
-                                    return (
-                                        <tr key={index}>
-                                            <td>{student.studentId}</td>
-                                            <td>{student.name || 'Student Name'}</td>
-                                            <td>
-                                                <span className={`status-badge ${isPresent ? 'present' : 'absent'}`}>
-                                                    {isPresent ? 'Present' : 'Absent'}
-                                                </span>
-                                            </td>
-                                            <td>{isPresent ? selectedRecord.checkInTime || '-' : '-'}</td>
-                                        </tr>
-                                    );
-                                })}
+                                {selectedRecord.detailedData?.students.map((student, index) => (
+                                    <tr key={index}>
+                                        <td>{student.studentId}</td>
+                                        <td>{generateRandomName()}</td>
+                                        <td className="status-cell status-present">
+                                            <span className="status-icon">✓</span>
+                                            <span className="status-text">Present</span>
+                                        </td>
+                                        <td>{student.checkInTime ? new Date(student.timestamp).toLocaleTimeString() : '-'}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

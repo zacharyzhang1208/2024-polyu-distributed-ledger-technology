@@ -768,10 +768,7 @@ class HttpServer {
                 res.status(200).send({
                     success: true,
                     total: lessonHistory.total,
-                    lessons: lessonHistory.lessons.map(lesson => ({
-                        ...lesson,
-                        timestamp: new Date(lesson.timestamp).toLocaleString(), // 格式化时间戳
-                    })),
+                    lessons: lessonHistory.lessons,
                     message: `找到 ${lessonHistory.total} 条课程记录`
                 });
             } catch (ex) {

@@ -7,7 +7,8 @@ import {
     getTeacherCourses, 
     getCourseAttendance, 
     getCourseEnrolledStudents,
-    createLessonAttendance 
+    createLessonAttendance,
+    getCourseLessonHistory
 } from '../../services/api';
 import '../../css/TeacherCourses.css';
 import '../../css/SearchBar.css';
@@ -42,6 +43,8 @@ const TeacherCourses = () => {
         startDate: '',
         endDate: ''
     });
+
+    const [lessonHistory, setLessonHistory] = useState([]);
 
     // 从 localStorage 获取教师ID
     const teacherId = JSON.parse(localStorage.getItem('user'))?.id;
@@ -118,7 +121,10 @@ const TeacherCourses = () => {
         try {
             // 获取考勤记录
             const attendanceData = await getCourseAttendance({ courseId: course.courseId });
-            setAttendanceRecords(attendanceData.records);
+            const lessonHistory = await getCourseLessonHistory(course.courseId);
+            setAttendanceRecords(attendanceRecords);
+            console.log("lessonHistory",lessonHistory);
+            setLessonHistory(lessonHistory);
             
             // 计算已注册学生数量
             const uniqueStudents = new Set(attendanceData.records.map(record => record.studentId));
@@ -292,6 +298,8 @@ const TeacherCourses = () => {
                             setDateRange={setDateRange}
                             attendanceRecords={attendanceRecords}
                             enrolledStudents={enrolledStudents}
+                            courseId={selectedCourse.courseId}
+                            lessonHistory={lessonHistory}
                         />
                     </div>
                 </div>
