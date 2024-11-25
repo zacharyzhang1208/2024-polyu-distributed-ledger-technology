@@ -13,13 +13,11 @@ function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState(USER_TYPES.STUDENT);
 
-    // 登录处理函数
     const handleLogin = (type) => {
         setIsAuthenticated(true);
         setUserType(type);
     };
 
-    // 登出处理函数
     const handleLogout = () => {
         setIsAuthenticated(false);
         setUserType(USER_TYPES.STUDENT);
@@ -39,13 +37,16 @@ function App() {
                                     userType={userType}
                                     onLogout={handleLogout}
                                 />
-                                
-                                <Routes>
-                                    <Route path="/student_courses" element={<StudentCourses />} />
-                                    <Route path="/teacher_courses" element={<TeacherCourses />} />
-                                    <Route path="/profile" element={<Profile user/>} />
-                                </Routes>
-                                
+                                <div style={{ 
+                                    marginLeft:'250px', 
+                                    width: 'calc(100% - 250px)'
+                                }}>
+                                    <Routes>
+                                        <Route path="/student_courses" element={<StudentCourses />} />
+                                        <Route path="/teacher_courses" element={<TeacherCourses />} />
+                                        <Route path="/profile" element={<Profile user/>} />
+                                    </Routes>
+                                </div>
                             </div>
                         ) : (
                             <Navigate to="/login" replace />
