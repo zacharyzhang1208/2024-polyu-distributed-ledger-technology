@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import CourseCard from '../CourseCard/Index';
-import SearchBar from '../SearchBar/Index';
+import CourseCard from '../common/CourseCard/Index';
+import SearchBar from '../common/SearchBar/Index';
 import { 
     getTeacherCourses, 
     getCourseAttendance, 

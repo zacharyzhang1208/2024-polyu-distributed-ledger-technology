@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { USER_TYPES, USER_ROUTES } from '../../constants/userTypes';
-import '../../css/Sidebar.css';
+import { USER_TYPES, USER_ROUTES } from '../../../constants/userTypes';
+import '../../../css/Sidebar.css';
 
-const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogout }) => {
+const Sidebar = ({ userType = USER_TYPES.STUDENT, onLogou   t }) => {
     const navigate = useNavigate();
     const location = useLocation();
     

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUserProfile, updateUserProfile } from '../../services/api';
+import Button from '../common/Button/Index';
 import '../../css/Profile.css';
 
 const Profile = () => {
@@ -150,13 +151,13 @@ const Profile = () => {
               {errors.phone && <span className="error-message">{errors.phone}</span>}
             </div>
 
-            <button 
-              type="submit" 
-              className="submit-button"
+            <Button 
+              type="submit"
+              loading={loading}
               disabled={loading}
             >
-              {loading ? 'Updating...' : 'Update Profile'}
-            </button>
+              Update Profile
+            </Button>
           </form>
         </>
       ) : (
@@ -168,20 +169,20 @@ const Profile = () => {
                 <input
                   type="checkbox"
                   name="allowMining"
-                  checked={settings.darkMode}
+                  checked={settings.allowMining}
                   onChange={handleSettingChange}
                 />
                 Allow Mining
               </label>
             </div>
 
-            <button 
-              type="submit" 
-              className="submit-button"
+            <Button 
+              type="submit"
+              loading={loading}
               disabled={loading}
             >
-              {loading ? 'Saving...' : 'Save Settings'}
-            </button>
+              Save Settings
+            </Button>
           </form>
         </div>
       )}

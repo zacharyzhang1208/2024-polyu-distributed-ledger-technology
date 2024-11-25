@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { USER_TYPES } from '../../constants/userTypes';
 import Login from '../Login/Index.jsx';
-import Sidebar from '../Sidebar/Index.jsx';
+import Sidebar from '../common/Sidebar/Index.jsx';
 import TeacherCourses from '../TeacherCourses/Index';
 import StudentCourses from '../StudentCourses/Index';
 import Profile from '../Profile/Index';
@@ -47,7 +47,7 @@ function App() {
                                     <Routes>
                                         <Route path="/student_courses" element={<StudentCourses />} />
                                         <Route path="/teacher_courses" element={<TeacherCourses />} />
-                                        <Route path="/profile" element={<Profile userType={userType}/>} />
+                                        <Route path="/profile" element={<Profile user/>} />
                                     </Routes>
                                 </div>
                             </div>

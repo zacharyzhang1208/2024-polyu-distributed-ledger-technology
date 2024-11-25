@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import CourseCard from '../CourseCard/Index';
-import SearchBar from '../SearchBar/Index';  // 导入搜索组件
+import CourseCard from '../common/CourseCard/Index';
+import SearchBar from '../common/SearchBar/Index';  // 导入搜索组件
 import '../../css/StudentCourses.css';
 import '../../css/Courses.css';
 import '../../css/Modal.css';

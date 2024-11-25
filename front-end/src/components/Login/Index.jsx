@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { USER_TYPES, DEFAULT_ROUTES } from '../../constants/userTypes';
 import { checkStudentRegistration, checkTeacherRegistration, registerStudent, registerTeacher } from '../../services/api';
+import Button from '../common/Button/Index';
 import '../../css/Login.css';
 
 const Login = ({ onLogin }) => {
@@ -159,14 +160,13 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
-          <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`} disabled={isLoading}>
-            {isLoading ? (
-              <div className="loading-spinner">
-                <div className="spinner"></div>
-                <span>{isLogin ? 'Logging in...' : 'Registering...'}</span>
-              </div>
-            ) : (isLogin ? 'Login' : 'Register')}
-          </button>
+          <Button
+            type="submit"
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            {isLogin ? 'Login' : 'Register'}
+          </Button>
         </form>
 
         <p className="switch-form">
