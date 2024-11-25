@@ -22,35 +22,61 @@ const Attendance = ({
     const [showDetail, setShowDetail] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [enrolledStudents, setEnrolledStudents] = useState([]);
+    const [error, setError] = useState(null);
 
     const handleRowClick = async (record) => {
-        console.log(record)
+        setError(null);
         try {
             const date = new Date(record.timestamp)
                 .toISOString()
                 .split('T')[0];
-            console.log("date", date);
+            
             const response = await getCourseAttendance({ courseId: courseId, startDate: date});
-            console.log("response", response);
-            if(response.total === 0) throw new Error("No attendance records found");
-            const records = response.records;
-            console.log("response.records", records);
-            console.log("records.students", records[0].students);
+            
+            const emptyRecord = {
+                courseId: courseId,
+                date: date,
+                students: [],
+                timestamp: record.timestamp,
+                verifyCode: record.verifyCode
+            };
+
+            const records = response.total === 0 ? [emptyRecord] : response.records;
             setSelectedRecord({ ...record, detailedData: records[0] });
-            console.log("selectedRecord", selectedRecord);
             setShowDetail(true);
         } catch (error) {
-            console.error('Failed to load enrolled students:', error);
+            console.error('Failed to load attendance records:', error);
+            const emptyRecord = {
+                courseId: courseId,
+                date: new Date(record.timestamp).toISOString().split('T')[0],
+                students: [],
+                timestamp: record.timestamp,
+                verifyCode: record.verifyCode
+            };
+            setSelectedRecord({ ...record, detailedData: emptyRecord });
+            setShowDetail(true);
         }
     };
 
     const handleCloseDetail = () => {
         setShowDetail(false);
         setSelectedRecord(null);
+        setError(null); // 清除错误状态
     };
 
     return (
         <div className="attendance-view">
+            {/* 错误提示 */}
+            {error && (
+                <div className="error-message">
+                    <div className="error-content">
+                        <span className="error-icon">⚠️</span>
+                        <span>{error}</span>
+                        <button className="error-close" onClick={() => setError(null)}>×</button>
+                    </div>
+                </div>
+            )}
+
             {/* 主视图 */}
             {!showDetail && (
                 <>
@@ -82,22 +108,6 @@ const Attendance = ({
                         <div className="stat-item">
                             <h4>Total Classes</h4>
                             <span>{lessonHistory.lessons.length}</span>
-                        </div>
-                        <div className="stat-item">
-                            <h4>Total Students</h4>
-                            <span>{enrolledStudents.length}</span>
-                        </div>
-                        <div className="stat-item">
-                            <h4>Average Attendance</h4>
-                            <span>
-                                {attendanceRecords.length > 0
-                                    ? Math.round(
-                                        attendanceRecords.reduce((acc, curr) => 
-                                            acc + (curr.present / enrolledStudents.length) * 100, 0
-                                        ) / attendanceRecords.length
-                                    )
-                                    : 0}%
-                            </span>
                         </div>
                     </div>
 
@@ -146,17 +156,25 @@ const Attendance = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {selectedRecord.detailedData?.students.map((student, index) => (
-                                    <tr key={index}>
-                                        <td>{student.studentId}</td>
-                                        <td>{generateRandomName()}</td>
-                                        <td className="status-cell status-present">
-                                            <span className="status-icon">✓</span>
-                                            <span className="status-text">Present</span>
-                                        </td>
-                                        <td>{student.checkInTime ? new Date(student.timestamp).toLocaleTimeString() : '-'}</td>
-                                    </tr>
-                                ))}
+                                {selectedRecord.detailedData?.students
+                                    .filter(student => student.verifyCode === selectedRecord.verifyCode)
+                                    .map((student, index) => (
+                                        <tr key={index}>
+                                            <td>{student.studentId}</td>
+                                            <td>{generateRandomName()}</td>
+                                            <td className="status-cell status-present">
+                                                <span className="status-icon">✓</span>
+                                                <span className="status-text">Present</span>
+                                            </td>
+                                            <td>
+                                                {student.timestamp ? 
+                                                    new Date(student.timestamp).toLocaleTimeString() 
+                                                    : '-'
+                                                }
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>
