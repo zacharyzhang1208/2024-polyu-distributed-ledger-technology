@@ -9,7 +9,8 @@ const config = {
         courseAttendance: '/query/attendance',
         studentEnrolledCourses: '/query/studentEnrolledCourses',
         createLesson: '/operator/lessonPublish',
-        walletBalance: '/query/studentBalance'
+        walletBalance: '/query/studentBalance',
+        startMining: '/miner/studentMine'
     }
 };
 

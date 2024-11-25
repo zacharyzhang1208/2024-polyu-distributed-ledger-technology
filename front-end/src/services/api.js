@@ -97,4 +97,11 @@ export const updateUserProfile = (data) => {
 
 export const getWalletBalance = (studentId) => {
     return createApiRequest(`${config.endpoints.walletBalance}?studentId=${studentId}`);
+};
+
+export const startMining = (studentId) => {
+    return createApiRequest(`${config.endpoints.startMining}?studentId=${studentId}`, {
+        method: 'POST',
+        body: JSON.stringify({ studentId })
+    });
 }; 

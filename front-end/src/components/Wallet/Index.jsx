@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getWalletBalance } from '../../services/api';
+import { getWalletBalance, startMining } from '../../services/api';
 import Button from '../common/Button/Index';
 import '../../css/Wallet.css';
 
 const Wallet = () => {
   const [loading, setLoading] = useState(false);
+  const [miningLoading, setMiningLoading] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [settings, setSettings] = useState({
     allowMining: false,
@@ -18,19 +19,50 @@ const Wallet = () => {
     try {
       setLoading(true);
       const user = JSON.parse(localStorage.getItem('user'));
-      console.log(user);
       if (!user || !user.id) {
         throw new Error('User information not found');
       }
       
       const response = await getWalletBalance(user.id);
-      console.log(response);
       setWalletBalance(response.balance || 0);
     } catch (error) {
       console.error('Failed to fetch wallet balance:', error);
       alert('Failed to fetch wallet balance');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStartMining = async (e) => {
+    e.preventDefault(); // 防止表单提交
+    try {
+      setMiningLoading(true);
+      const user = JSON.parse(localStorage.getItem('user'));
+      console.log(user);
+      if (!user || !user.id) {
+        throw new Error('User information not found');
+      }
+
+      const response = await startMining(user.id);
+      console.log('Mining started:', response);
+      
+      if (response.success) {
+        alert('Mining started successfully!');
+        // 开始挖矿后刷新余额
+        await fetchWalletBalance();
+      } else {
+        throw new Error(response.message || 'Failed to start mining');
+      }
+    } catch (error) {
+      console.error('Failed to start mining:', error);
+      alert(error.message || 'Failed to start mining');
+      // 如果挖矿失败，关闭挖矿开关
+      setSettings(prev => ({
+        ...prev,
+        allowMining: false
+      }));
+    } finally {
+      setMiningLoading(false);
     }
   };
 
@@ -73,7 +105,7 @@ const Wallet = () => {
         {/* Settings Section */}
         <div className="section-card">
           <h2 className="section-title">Mining Settings</h2>
-          <form className="settings-form">
+          <form className="settings-form" onSubmit={handleStartMining}>
             <div className="settings-group">
               <div className="settings-item">
                 <label className="settings-label">
@@ -97,10 +129,10 @@ const Wallet = () => {
             {settings.allowMining && (
                 <Button 
                   type="submit"
-                  loading={loading}
-                  disabled={loading}
+                  loading={miningLoading}
+                  disabled={miningLoading}
                 >
-                  Start Mining
+                  {miningLoading ? 'Starting Mining...' : 'Start Mining'}
                 </Button>
             )}
           </form>
