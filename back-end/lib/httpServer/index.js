@@ -865,8 +865,6 @@ class HttpServer {
             res.send(err.message + (err.cause ? ' - ' + err.cause.message : ''));
         });
 
-        // // 在构造函数末尾添加自动初始化逻辑
-        // this.initializeIds(operator, blockchain, miner);
     }
 
     
